@@ -1,10 +1,13 @@
 import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getProperty } from "@/lib/properties";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { 
   MapPin, 
   Bed, 
@@ -16,35 +19,187 @@ import {
   Share2,
   Heart,
   Phone,
-  Mail
+  Mail,
+  Check,
+  Loader2,
+  AlertCircle,
+  Image as ImageIcon
 } from "lucide-react";
+import property1 from "@/assets/property-1.jpg";
 import property2 from "@/assets/property-2.jpg";
+import property3 from "@/assets/property-3.jpg";
+
+// Demo properties for when IDs start with "demo-"
+const demoProperties: Record<string, any> = {
+  "demo-1": {
+    id: "demo-1",
+    image: property1,
+    title: "Modern Apartment in City Center",
+    location: "Prishtinë, Kosovë",
+    price: "€120,000",
+    beds: 2,
+    baths: 2,
+    area: 85,
+    mediaType: "3d",
+    forRent: false,
+    description: "Beautiful modern apartment located in the heart of Pristina. Features include spacious living areas, modern kitchen with appliances, and stunning city views. Close to shopping centers, restaurants, and public transportation.",
+    gallery: [property1, property2, property3]
+  },
+  "demo-2": {
+    id: "demo-2",
+    image: property2,
+    title: "Luxury Penthouse with View",
+    location: "Prishtinë, Kosovë",
+    price: "€2,500/muaj",
+    beds: 3,
+    baths: 3,
+    area: 150,
+    mediaType: "video",
+    forRent: true,
+    description: "Exclusive penthouse offering panoramic city views. This luxury property features high-end finishes, spacious terraces, and premium amenities. Perfect for those seeking the finest living experience in Pristina.",
+    videoUrl: "",
+    gallery: [property2, property1, property3]
+  },
+  "demo-3": {
+    id: "demo-3",
+    image: property3,
+    title: "Cozy House with Yard",
+    location: "Pejë, Kosovë",
+    price: "€95,000",
+    beds: 2,
+    baths: 1,
+    area: 70,
+    mediaType: "photo",
+    forRent: false,
+    description: "Charming house with a private yard in a peaceful neighborhood. Ideal for families looking for a quiet retreat with easy access to local amenities and nature.",
+    gallery: [property3, property1, property2]
+  },
+  "demo-4": {
+    id: "demo-4",
+    image: property1,
+    title: "Comfortable Studio",
+    location: "Prizren, Kosovë",
+    price: "€800/muaj",
+    beds: 1,
+    baths: 1,
+    area: 45,
+    mediaType: "3d",
+    forRent: true,
+    description: "Compact and efficient studio apartment perfect for students or young professionals. Fully furnished with modern amenities in a convenient location.",
+    gallery: [property1, property3]
+  },
+  "demo-5": {
+    id: "demo-5",
+    image: property2,
+    title: "Luxury Villa with Pool",
+    location: "Prishtinë, Kosovë",
+    price: "€450,000",
+    beds: 5,
+    baths: 4,
+    area: 320,
+    mediaType: "video",
+    forRent: false,
+    description: "Stunning luxury villa featuring a private pool, spacious gardens, and high-end finishes throughout. This exceptional property offers the ultimate in comfort and elegance.",
+    videoUrl: "",
+    gallery: [property2, property1, property3]
+  }
+};
 
 export default function PropertyDetail() {
   const { id } = useParams();
+  const { data: property, isLoading, isError, error } = useQuery({
+    queryKey: ["property", id],
+    queryFn: async () => {
+      if (!id) throw new Error("No property ID provided");
+      
+      // Check if it's a demo property
+      if (id.startsWith("demo-")) {
+        const demoProperty = demoProperties[id];
+        if (demoProperty) {
+          // Simulate network delay
+          await new Promise(resolve => setTimeout(resolve, 300));
+          return demoProperty;
+        }
+      }
+      
+      // Try to fetch from Firestore
+      const result = await getProperty(id);
+      if (!result) throw new Error("Property not found");
+      return result;
+    },
+    enabled: !!id,
+    retry: 1,
+    staleTime: 5000
+  });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <Header />
       
+      {isLoading ? (
+        <div className="pt-16 min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-accent mx-auto" />
+            <p className="text-muted-foreground">Loading property details...</p>
+          </div>
+        </div>
+      ) : isError || !property ? (
+        <div className="pt-16 min-h-screen flex items-center justify-center p-4">
+          <Card className="max-w-md w-full">
+            <CardContent className="pt-6 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto">
+                <AlertCircle className="h-8 w-8 text-red-600" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold">Property Not Found</h2>
+                <p className="text-muted-foreground">
+                  The property you're looking for doesn't exist or has been removed.
+                </p>
+              </div>
+              <Button variant="hero" onClick={() => window.history.back()}>
+                Go Back
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+      <>
       <main className="pt-16">
         {/* Hero Image Section */}
-        <section className="relative h-[60vh] bg-muted">
-          <img 
-            src={property2} 
-            alt="Property" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+        <section className="relative h-[70vh] bg-muted overflow-hidden">
+          {property.videoUrl && property.mediaType === 'video' ? (
+            <video
+              src={property.videoUrl}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <img
+              src={property.image || property1}
+              alt={property.title}
+              className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-700"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
           
           {/* Floating Action Buttons */}
-          <div className="absolute top-6 right-6 flex gap-3">
-            <Button size="icon" variant="secondary" className="rounded-full shadow-lg">
+          <div className="absolute top-6 right-6 flex gap-3 animate-fade-in">
+            <Button size="icon" variant="secondary" className="rounded-full shadow-xl hover:scale-110 transition-transform backdrop-blur-sm bg-white/90">
               <Share2 className="h-5 w-5" />
             </Button>
-            <Button size="icon" variant="secondary" className="rounded-full shadow-lg">
+            <Button size="icon" variant="secondary" className="rounded-full shadow-xl hover:scale-110 transition-transform backdrop-blur-sm bg-white/90">
               <Heart className="h-5 w-5" />
             </Button>
+          </div>
+
+          {/* Property Badge */}
+          <div className="absolute top-6 left-6">
+            <Badge className={`text-sm px-4 py-2 ${property.forRent ? 'bg-green-500' : 'bg-blue-500'} text-white shadow-xl`}>
+              {property.forRent ? '🏠 For Rent' : '🏘️ For Sale'}
+            </Badge>
           </div>
         </section>
 
@@ -55,85 +210,155 @@ export default function PropertyDetail() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-8">
                 {/* Header */}
-                <div className="space-y-4 animate-fade-in">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h1 className="mb-3">Penthouse me Pamje Panoramike</h1>
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    <div className="flex-1 space-y-3">
+                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">{property.title}</h1>
                       <div className="flex items-center text-muted-foreground">
-                        <MapPin className="h-5 w-5 mr-2" />
-                        <span className="text-lg">Prishtinë, Kosovë</span>
+                        <MapPin className="h-5 w-5 mr-2 text-accent" />
+                        <span className="text-lg">{property.location}</span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-4xl font-bold text-primary">€2,500</div>
-                      <div className="text-muted-foreground">/ muaj</div>
+                    <div className="text-left lg:text-right space-y-2">
+                      <div className="text-4xl lg:text-5xl font-bold gradient-text">{property.price}</div>
+                      {property.forRent && <div className="text-muted-foreground text-lg">per month</div>}
                     </div>
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="flex flex-wrap gap-6 py-6 border-y">
-                    <div className="flex items-center gap-2">
-                      <Bed className="h-5 w-5 text-accent" />
-                      <span className="font-semibold">3 Dhoma</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-6 border-y">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Bed className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold">{property.beds}</div>
+                        <div className="text-xs text-muted-foreground">Bedrooms</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Bath className="h-5 w-5 text-accent" />
-                      <span className="font-semibold">3 Banjo</span>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Bath className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold">{property.baths}</div>
+                        <div className="text-xs text-muted-foreground">Bathrooms</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Square className="h-5 w-5 text-accent" />
-                      <span className="font-semibold">150m²</span>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Square className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold">{property.area}</div>
+                        <div className="text-xs text-muted-foreground">m² Area</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-accent" />
-                      <span className="font-semibold">2023</span>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Calendar className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold">2023</div>
+                        <div className="text-xs text-muted-foreground">Built Year</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Car className="h-5 w-5 text-accent" />
-                      <span className="font-semibold">2 Parking</span>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Car className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold">2</div>
+                        <div className="text-xs text-muted-foreground">Parking</div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Description */}
-                <Card className="p-6 space-y-4 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-                  <h2 className="text-2xl font-bold">Përshkrimi</h2>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Penthouse i jashtëzakonshëm me pamje panoramike të qytetit. Kjo pronë luksoze ofron një
-                    kombinim perfekt të hapësirës, dritës natyrore dhe dizajnit modern. Me 150m² hapësirë jetesore,
-                    3 dhoma gjumi, 3 banja dhe 2 vende parkimi, kjo është banesa ideale për ata që kërkojnë luksin
-                    dhe komoditetin.
-                  </p>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Ndodhur në një nga lagjet më të kërkuara të Prishtinës, kjo pronë ofron akses të lehtë në
-                    të gjitha shërbimet urbane, qendra tregtare, restorante dhe institucione arsimore.
-                  </p>
+                <Card className="shadow-medium hover:shadow-hard transition-shadow animate-fade-in" style={{ animationDelay: "0.1s" }}>
+                  <CardHeader className="border-b">
+                    <CardTitle className="flex items-center gap-2">
+                      <Home className="h-6 w-6 text-accent" />
+                      Property Description
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line text-base">
+                      {property.description && property.description.trim().length > 0
+                        ? property.description
+                        : 'No description available for this property.'}
+                    </p>
+                  </CardContent>
                 </Card>
 
-                {/* Features */}
-                <Card className="p-6 space-y-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                  <h2 className="text-2xl font-bold">Veçoritë</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {[
-                      "Ngrohje Qendrore",
-                      "Ajër i Kondicionuar",
-                      "Ballkon i Madh",
-                      "Ashensor",
-                      "Internet Fiber",
-                      "Siguri 24/7",
-                      "Mobiluar",
-                      "Paisje Moderne",
-                      "Pamje nga Qyteti"
-                    ].map((feature, index) => (
-                      <div 
-                        key={index}
-                        className="flex items-center gap-2 text-muted-foreground"
-                      >
-                        <Home className="h-4 w-4 text-accent" />
-                        <span>{feature}</span>
+                {/* Optional Video Section if separate from hero */}
+                {property?.videoUrl && property.mediaType === 'video' && (
+                  <Card className="p-4 space-y-2">
+                    <h2 className="text-xl font-bold">Video</h2>
+                    <video src={property.videoUrl} className="w-full rounded" controls />
+                  </Card>
+                )}
+
+                {/* Gallery Section */}
+                {property.gallery && property.gallery.length > 0 && (
+                  <Card className="shadow-medium hover:shadow-hard transition-shadow">
+                    <CardHeader className="border-b">
+                      <CardTitle className="flex items-center gap-2">
+                        <ImageIcon className="h-6 w-6 text-accent" />
+                        Photo Gallery ({property.gallery.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {property.gallery.map((url, idx) => (
+                          <div key={idx} className="group relative aspect-video overflow-hidden rounded-lg">
+                            <img 
+                              src={url} 
+                              alt={`gallery-${idx}`} 
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Features */}
+                <Card className="shadow-medium hover:shadow-hard transition-shadow animate-fade-in" style={{ animationDelay: "0.2s" }}>
+                  <CardHeader className="border-b">
+                    <CardTitle className="flex items-center gap-2">
+                      <Check className="h-6 w-6 text-accent" />
+                      Property Features
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {[
+                        "Central Heating",
+                        "Air Conditioning",
+                        "Large Balcony",
+                        "Elevator",
+                        "Fiber Internet",
+                        "24/7 Security",
+                        "Furnished",
+                        "Modern Appliances",
+                        "City View"
+                      ].map((feature, index) => (
+                        <div 
+                          key={index}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                            <Check className="h-4 w-4 text-accent" />
+                          </div>
+                          <span className="text-sm font-medium">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
                 </Card>
 
                 {/* Map Placeholder */}
@@ -147,54 +372,65 @@ export default function PropertyDetail() {
 
               {/* Sidebar - Contact Form */}
               <div className="lg:col-span-1">
-                <Card className="p-6 space-y-6 sticky top-24 animate-scale-in">
-                  <h3 className="text-xl font-bold">Interesohem për këtë pronë</h3>
+                <Card className="shadow-medium hover:shadow-hard transition-shadow sticky top-24 animate-scale-in">
+                  <CardHeader className="border-b">
+                    <CardTitle className="text-lg">Interested in this property?</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6 space-y-6">
                   
                   <form className="space-y-4">
-                    <div>
-                      <Input placeholder="Emri i plotë" className="h-12" />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Full Name</label>
+                      <Input placeholder="John Doe" className="h-11" />
                     </div>
-                    <div>
-                      <Input type="email" placeholder="Email" className="h-12" />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email</label>
+                      <Input type="email" placeholder="john@example.com" className="h-11" />
                     </div>
-                    <div>
-                      <Input type="tel" placeholder="Telefon" className="h-12" />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Phone</label>
+                      <Input type="tel" placeholder="+383 44 123 456" className="h-11" />
                     </div>
-                    <div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Message</label>
                       <Textarea 
-                        placeholder="Mesazhi juaj..." 
-                        className="min-h-[120px]"
+                        placeholder="I'm interested in this property..." 
+                        className="min-h-[100px] resize-none"
                       />
                     </div>
-                    <Button variant="hero" size="lg" className="w-full">
-                      Dërgo Mesazh
+                    <Button variant="hero" size="lg" className="w-full gap-2">
+                      <Mail className="h-4 w-4" />
+                      Send Message
                     </Button>
                   </form>
 
-                  <div className="border-t pt-6 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Phone className="h-6 w-6 text-accent" />
+                  <div className="border-t pt-6 space-y-3">
+                    <p className="text-sm font-medium text-center">Or contact us directly:</p>
+                    <a href="tel:+38344123456" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                        <Phone className="h-5 w-5 text-accent" />
                       </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Na telefononi</div>
+                      <div className="text-left">
+                        <div className="text-xs text-muted-foreground">Call us</div>
                         <div className="font-semibold">+383 44 123 456</div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Mail className="h-6 w-6 text-accent" />
+                    </a>
+                    <a href="mailto:info@prona360.com" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-5 w-5 text-accent" />
                       </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Dërgo email</div>
-                        <div className="font-semibold">info@prona360.com</div>
+                      <div className="text-left">
+                        <div className="text-xs text-muted-foreground">Email us</div>
+                        <div className="font-semibold text-sm">info@prona360.com</div>
                       </div>
-                    </div>
+                    </a>
                   </div>
 
-                  <Button variant="premium" size="lg" className="w-full">
-                    Rezervo Turë Virtuale
+                  <Button variant="premium" size="lg" className="w-full gap-2">
+                    <Home className="h-5 w-5" />
+                    Schedule Virtual Tour
                   </Button>
+                  </CardContent>
                 </Card>
               </div>
             </div>
@@ -203,6 +439,8 @@ export default function PropertyDetail() {
       </main>
 
       <Footer />
+      </>
+      )}
     </div>
   );
 }
