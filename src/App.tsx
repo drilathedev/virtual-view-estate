@@ -9,13 +9,16 @@ import PropertyDetail from "./pages/PropertyDetail";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import Properties from "./pages/Properties";
+import Services from "./pages/Services";
+import Contact from "./pages/Contact";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
 const AdminRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAdmin, loading } = useAuth();
-  if (loading) return <div className="p-10 text-center">Loading...</div>;
+  if (loading) return <div className="p-10 text-center">Duke u ngarkuar…</div>;
   if (!isAdmin) return <Navigate to="/login" replace />;
   return children;
 };
@@ -40,6 +43,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/properties" element={<Properties />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/property/:id" element={<PropertyDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

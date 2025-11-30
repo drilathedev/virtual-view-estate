@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, DocumentSnapshot } from 'firebase/firestore';
 import { db } from './firebase';
 
 export type MediaType = 'photo' | 'video' | '3d';
@@ -15,6 +15,7 @@ export interface Property {
   forRent?: boolean;
   image: string; // main image URL
   videoUrl?: string; // optional video URL
+  kuulaId?: string; // optional Kuula collection ID for 3D tours
   description?: string; // long text description
   gallery?: string[]; // additional image URLs
   createdAt?: Date;
@@ -23,7 +24,7 @@ export interface Property {
 
 const propertiesCol = collection(db, 'properties');
 
-function mapDoc(d: any): Property {
+function mapDoc(d: DocumentSnapshot): Property {
   const data = d.data();
   return {
     id: d.id,
@@ -37,6 +38,7 @@ function mapDoc(d: any): Property {
     forRent: data.forRent,
     image: data.image,
     videoUrl: data.videoUrl,
+    kuulaId: data.kuulaId,
     description: data.description,
     gallery: data.gallery,
     createdAt: data.createdAt?.toDate?.() ?? undefined,
@@ -59,24 +61,59 @@ export async function getProperty(id: string): Promise<Property | null> {
 export type CreatePropertyInput = Omit<Property, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdatePropertyInput = Partial<CreatePropertyInput>;
 
-export async function createProperty(data: CreatePropertyInput): Promise<string> {
-  const docRef = await addDoc(propertiesCol, {
-    ...data,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
+// Small helper to fail a slow operation after timeoutMs milliseconds.
+function withTimeout<T>(p: Promise<T>, timeoutMs = 15000): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    let settled = false;
+    p.then(v => { if (!settled) { settled = true; resolve(v); } }).catch(err => { if (!settled) { settled = true; reject(err); } });
+    setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        reject(new Error(`operation timed out after ${timeoutMs}ms`));
+      }
+    }, timeoutMs);
   });
-  return docRef.id;
+}
+
+export async function createProperty(data: CreatePropertyInput): Promise<string> {
+  try {
+    const promise = addDoc(propertiesCol, {
+      ...data,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    const docRef = await withTimeout(promise, 15000);
+    console.log('[lib/properties] createProperty succeeded', { id: docRef.id });
+    return docRef.id;
+  } catch (err: unknown) {
+    console.error('[lib/properties] createProperty failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
+    // Rethrow so callers (mutations) receive proper rejection and can clear UI states
+    throw err;
+  }
 }
 
 export async function updateProperty(id: string, data: UpdatePropertyInput): Promise<void> {
-  const ref = doc(db, 'properties', id);
-  await updateDoc(ref, {
-    ...data,
-    updatedAt: serverTimestamp()
-  });
+  try {
+    const ref = doc(db, 'properties', id);
+    await withTimeout(updateDoc(ref, {
+      ...data,
+      updatedAt: serverTimestamp()
+    }), 15000);
+    console.log('[lib/properties] updateProperty succeeded', { id });
+  } catch (err: unknown) {
+    console.error('[lib/properties] updateProperty failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
+    throw err;
+  }
 }
 
 export async function deleteProperty(id: string): Promise<void> {
-  const ref = doc(db, 'properties', id);
-  await deleteDoc(ref);
+  try {
+    const ref = doc(db, 'properties', id);
+    await withTimeout(deleteDoc(ref), 15000);
+    console.log('[lib/properties] deleteProperty succeeded', { id });
+  } catch (err: unknown) {
+    console.error('[lib/properties] deleteProperty failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
+    throw err;
+  }
 }

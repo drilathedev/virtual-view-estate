@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProperty } from "@/lib/properties";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Kuula3DViewer } from "@/components/Kuula3DViewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,7 +35,7 @@ const demoProperties: Record<string, any> = {
   "demo-1": {
     id: "demo-1",
     image: property1,
-    title: "Modern Apartment in City Center",
+    title: "Apartament Modern në Qendër",
     location: "Prishtinë, Kosovë",
     price: "€120,000",
     beds: 2,
@@ -42,13 +43,13 @@ const demoProperties: Record<string, any> = {
     area: 85,
     mediaType: "3d",
     forRent: false,
-    description: "Beautiful modern apartment located in the heart of Pristina. Features include spacious living areas, modern kitchen with appliances, and stunning city views. Close to shopping centers, restaurants, and public transportation.",
+    description: "Apartament modern në zemër të Prishtinës. Dhomat e gjera, kuzhina moderne dhe pamje të bukura të qytetit. Afër qendrave tregtare dhe transportit publik.",
     gallery: [property1, property2, property3]
   },
   "demo-2": {
     id: "demo-2",
     image: property2,
-    title: "Luxury Penthouse with View",
+    title: "Penthouse Luksoz me Pamje",
     location: "Prishtinë, Kosovë",
     price: "€2,500/muaj",
     beds: 3,
@@ -56,14 +57,14 @@ const demoProperties: Record<string, any> = {
     area: 150,
     mediaType: "video",
     forRent: true,
-    description: "Exclusive penthouse offering panoramic city views. This luxury property features high-end finishes, spacious terraces, and premium amenities. Perfect for those seeking the finest living experience in Pristina.",
+    description: "Penthouse ekskluziv me pamje panoramike. Ambientet e rafinuara, tarraca të mëdha dhe komoditete premium.",
     videoUrl: "",
     gallery: [property2, property1, property3]
   },
   "demo-3": {
     id: "demo-3",
     image: property3,
-    title: "Cozy House with Yard",
+    title: "Shtëpi e Ngrohtë me Oborr",
     location: "Pejë, Kosovë",
     price: "€95,000",
     beds: 2,
@@ -71,13 +72,13 @@ const demoProperties: Record<string, any> = {
     area: 70,
     mediaType: "photo",
     forRent: false,
-    description: "Charming house with a private yard in a peaceful neighborhood. Ideal for families looking for a quiet retreat with easy access to local amenities and nature.",
+    description: "Shtëpi e rehatshme me oborr privat në një lagje të qetë. I përshtatshëm për familje.",
     gallery: [property3, property1, property2]
   },
   "demo-4": {
     id: "demo-4",
     image: property1,
-    title: "Comfortable Studio",
+    title: "Studio i Rehatshëm",
     location: "Prizren, Kosovë",
     price: "€800/muaj",
     beds: 1,
@@ -85,13 +86,13 @@ const demoProperties: Record<string, any> = {
     area: 45,
     mediaType: "3d",
     forRent: true,
-    description: "Compact and efficient studio apartment perfect for students or young professionals. Fully furnished with modern amenities in a convenient location.",
+    description: "Studio praktik, i përshtatshëm për studentë ose profesionistë të rinj. Komplet i mobiluar dhe i pozicionuar mirë.",
     gallery: [property1, property3]
   },
   "demo-5": {
     id: "demo-5",
     image: property2,
-    title: "Luxury Villa with Pool",
+    title: "Vilë Luksoze me Pishinë",
     location: "Prishtinë, Kosovë",
     price: "€450,000",
     beds: 5,
@@ -99,7 +100,7 @@ const demoProperties: Record<string, any> = {
     area: 320,
     mediaType: "video",
     forRent: false,
-    description: "Stunning luxury villa featuring a private pool, spacious gardens, and high-end finishes throughout. This exceptional property offers the ultimate in comfort and elegance.",
+    description: "Vilë e jashtëzakonshme me pishinë private, kopshte të mëdha dhe përfundime luksoze. Komfort dhe elegancë në çdo detaj.",
     videoUrl: "",
     gallery: [property2, property1, property3]
   }
@@ -107,7 +108,7 @@ const demoProperties: Record<string, any> = {
 
 export default function PropertyDetail() {
   const { id } = useParams();
-  const { data: property, isLoading, isError, error } = useQuery({
+  const { data: property, isLoading, isError } = useQuery({
     queryKey: ["property", id],
     queryFn: async () => {
       if (!id) throw new Error("No property ID provided");
@@ -124,7 +125,7 @@ export default function PropertyDetail() {
       
       // Try to fetch from Firestore
       const result = await getProperty(id);
-      if (!result) throw new Error("Property not found");
+      if (!result) throw new Error("Pronë nuk u gjet");
       return result;
     },
     enabled: !!id,
@@ -140,7 +141,7 @@ export default function PropertyDetail() {
         <div className="pt-16 min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
             <Loader2 className="h-12 w-12 animate-spin text-accent mx-auto" />
-            <p className="text-muted-foreground">Loading property details...</p>
+            <p className="text-muted-foreground">Po ngarkohen detajet e pronës…</p>
           </div>
         </div>
       ) : isError || !property ? (
@@ -151,9 +152,9 @@ export default function PropertyDetail() {
                 <AlertCircle className="h-8 w-8 text-red-600" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold">Property Not Found</h2>
+                <h2 className="text-2xl font-bold">Pronë Nuk U Gjet</h2>
                 <p className="text-muted-foreground">
-                  The property you're looking for doesn't exist or has been removed.
+                  Pronë e pa-gjetur ose është hequr.
                 </p>
               </div>
               <Button variant="hero" onClick={() => window.history.back()}>
@@ -166,11 +167,15 @@ export default function PropertyDetail() {
       <>
       <main className="pt-16">
         {/* Hero Image Section */}
-        <section className="relative h-[70vh] bg-muted overflow-hidden">
-          {property.videoUrl && property.mediaType === 'video' ? (
+        <section className="relative bg-muted overflow-hidden">
+          {property.mediaType === '3d' && property.kuulaId ? (
+            <div className="h-[70vh]">
+              <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
+            </div>
+          ) : property.videoUrl && property.mediaType === 'video' ? (
             <video
               src={property.videoUrl}
-              className="w-full h-full object-cover"
+              className="w-full h-[70vh] object-cover"
               autoPlay
               muted
               loop
@@ -180,7 +185,7 @@ export default function PropertyDetail() {
             <img
               src={property.image || property1}
               alt={property.title}
-              className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-700"
+              className="w-full h-[70vh] object-cover scale-105 hover:scale-100 transition-transform duration-700"
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
@@ -198,7 +203,7 @@ export default function PropertyDetail() {
           {/* Property Badge */}
           <div className="absolute top-6 left-6">
             <Badge className={`text-sm px-4 py-2 ${property.forRent ? 'bg-green-500' : 'bg-blue-500'} text-white shadow-xl`}>
-              {property.forRent ? '🏠 For Rent' : '🏘️ For Sale'}
+              {property.forRent ? '🏠 Me Qira' : '🏘️ Në Shitje'}
             </Badge>
           </div>
         </section>
@@ -280,14 +285,14 @@ export default function PropertyDetail() {
                   <CardHeader className="border-b">
                     <CardTitle className="flex items-center gap-2">
                       <Home className="h-6 w-6 text-accent" />
-                      Property Description
+                      Përshkrimi i Pronës
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-line text-base">
                       {property.description && property.description.trim().length > 0
                         ? property.description
-                        : 'No description available for this property.'}
+                        : 'Nuk ka përshkrim për këtë pronë.'}
                     </p>
                   </CardContent>
                 </Card>
@@ -300,13 +305,28 @@ export default function PropertyDetail() {
                   </Card>
                 )}
 
+                {/* Optional 3D Tour Section */}
+                {property?.kuulaId && property.mediaType === '3d' && (
+                  <Card className="shadow-medium hover:shadow-hard transition-shadow p-0 overflow-hidden">
+                    <CardHeader className="border-b">
+                      <CardTitle className="flex items-center gap-2">
+                        <span className="text-2xl">🎮</span>
+                        Tur 3D Interaktiv
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Gallery Section */}
                 {property.gallery && property.gallery.length > 0 && (
                   <Card className="shadow-medium hover:shadow-hard transition-shadow">
                     <CardHeader className="border-b">
-                      <CardTitle className="flex items-center gap-2">
-                        <ImageIcon className="h-6 w-6 text-accent" />
-                        Photo Gallery ({property.gallery.length})
+                          <CardTitle className="flex items-center gap-2">
+                            <ImageIcon className="h-6 w-6 text-accent" />
+                            Galeri Fotografish ({property.gallery.length})
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
@@ -328,10 +348,10 @@ export default function PropertyDetail() {
 
                 {/* Features */}
                 <Card className="shadow-medium hover:shadow-hard transition-shadow animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                  <CardHeader className="border-b">
-                    <CardTitle className="flex items-center gap-2">
-                      <Check className="h-6 w-6 text-accent" />
-                      Property Features
+                    <CardHeader className="border-b">
+                      <CardTitle className="flex items-center gap-2">
+                        <Check className="h-6 w-6 text-accent" />
+                        Tiparet e Pronës
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
@@ -374,7 +394,7 @@ export default function PropertyDetail() {
               <div className="lg:col-span-1">
                 <Card className="shadow-medium hover:shadow-hard transition-shadow sticky top-24 animate-scale-in">
                   <CardHeader className="border-b">
-                    <CardTitle className="text-lg">Interested in this property?</CardTitle>
+                    <CardTitle className="text-lg">A jeni të interesuar për këtë pronë?</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6 space-y-6">
                   
@@ -394,7 +414,7 @@ export default function PropertyDetail() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Message</label>
                       <Textarea 
-                        placeholder="I'm interested in this property..." 
+                        placeholder="Jam i/e interesuar për këtë pronë..." 
                         className="min-h-[100px] resize-none"
                       />
                     </div>
@@ -426,10 +446,10 @@ export default function PropertyDetail() {
                     </a>
                   </div>
 
-                  <Button variant="premium" size="lg" className="w-full gap-2">
+                  {/* <Button variant="premium" size="lg" className="w-full gap-2">
                     <Home className="h-5 w-5" />
                     Schedule Virtual Tour
-                  </Button>
+                  </Button> */}
                   </CardContent>
                 </Card>
               </div>

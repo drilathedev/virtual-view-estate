@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// Firebase Storage rules: example file to allow authenticated uploads to
+// specific folders and show safer production patterns (custom claims / admin allowlist).
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow anyone to read stored files.
+    match /{allPaths=**} {
+      allow read: if true;
+    }
+
+    // Dev-friendly: authenticated users may write to property-images
+    match /property-images/{allPaths=**} {
+      allow read: if true;
+      // Allow write for authenticated users (quick & safe for dev)
+      allow write: if request.auth != null;
+    }
+
+    // Dev-friendly: authenticated users may write to property-videos
+    match /property-videos/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Example: restrict writes to a small admin allowlist (less flexible)
+    // Replace the emails with your admins. Note: this is static in the rule.
+    // Using custom claims is the recommended approach for production.
+    match /admin-only/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email in ['admin@example.com'];
+    }
+
+    // Production pattern (recommended): use a custom claim on Auth users
+    // then allow writes only for users with the claim. Example:
+    // allow write: if request.auth != null && request.auth.token.admin == true;
+
+  }
+}

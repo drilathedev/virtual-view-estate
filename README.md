@@ -81,7 +81,7 @@ Create a `.env` file (or `.env.local`) in the project root with your Firebase ke
 VITE_FIREBASE_API_KEY=your_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
 VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket    # e.g. pronad360d.firebasestorage.app (or use the full gs:// URL)
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id # optional
@@ -89,6 +89,91 @@ VITE_ADMIN_EMAILS=admin1@example.com,admin2@example.com
 ```
 
 The app reads config in `src/lib/firebase.ts`. Admin access is currently determined by the `VITE_ADMIN_EMAILS` allowlist.
+
+Note: the app now accepts either a plain bucket name (e.g. `prona360d.firebasestorage.app`) or a full `gs://` URL in `VITE_FIREBASE_STORAGE_BUCKET`. The SDK is initialized to target the configured bucket explicitly so uploads from the Admin UI (via `src/lib/storage.ts`) will go to that bucket.
+
+Upload behavior:
+- Files uploaded by the Admin UI use the helper `src/lib/storage.ts` and are stored under the folder you pick (e.g. `property-images` or `property-videos`).
+- File names are sanitized and prefixed with a timestamp (e.g. `property-images/1691234567890_my_photo.jpg`).
+- Content-type metadata is set from the uploaded file (so images/videos are stored with the correct MIME type).
+
+403 Permission denied while uploading
+-----------------------------------
+
+If you see "403 Permission denied" (like the POST to https://firebasestorage.googleapis.com/v0/b/<your-bucket>/o returning 403), that means the client is not authorized to write to the bucket under your current Storage rules. Common causes and fixes:
+
+- You're not signed in (or your authentication token wasn't sent). The client SDK must be used while the user is authenticated, or the Storage rules must allow unauthenticated writes (not recommended).
+- Your Storage security rules disallow writes to the path you attempted to upload to — update the rules to allow authenticated writes, or restrict writes to an allowlist of admin emails / custom claims.
+- You're making REST calls directly and missing the Authorization header (ID token) or CORS is blocking the request.
+
+Suggested minimal rules for development (restrict writes to authenticated users):
+
+```
+rules_version = '2';
+service firebase.storage {
+	match /b/{bucket}/o {
+		match /property-images/{allPaths=**} {
+			allow read: if true;
+			// allow create/write only if authenticated
+			allow write: if request.auth != null;
+		}
+
+		match /property-videos/{allPaths=**} {
+			allow read: if true;
+			allow write: if request.auth != null;
+		}
+
+		// Fallback — only admins can write elsewhere. Replace these emails with your admin addresses
+		match /{allPaths=**} {
+			allow read: if true;
+			allow write: if request.auth != null && request.auth.token.email in ['your-admin@example.com'];
+		}
+	}
+}
+```
+
+Stronger production pattern (recommended): use custom claims for admin users and limit write access to users where `request.auth.token.admin == true`.
+
+Deploy rules using the Firebase Console or via the Firebase CLI (firebase deploy --only storage).
+
+If you are using direct REST calls (not the SDK), ensure the request has an Authorization header with a current ID token from Firebase Auth. The browser SDK handles this automatically if the user is signed in.
+
+Finally, the app now surfaces friendly errors when uploads fail — the Admin UI will show a toast telling you to sign-in or that permission was denied, and the upload helper will return helpful text. If you still get 403, double-check these rules and the console logs.
+
+Deploying rules with the Firebase CLI (example)
+----------------------------------------------
+
+If you'd like to deploy the `storage.rules` file that lives in the repository, here's a quick guide using the Firebase CLI:
+
+1. Install the CLI (if you haven't):
+
+```bash
+npm install -g firebase-tools
+firebase login
+```
+
+2. Option A — quick manual deploy from the Console:
+	 - Go to the Firebase Console → Storage → Rules, paste the rules from `storage.rules` and publish.
+
+3. Option B — deploy with the CLI (recommended if you want rules in source control):
+	 - Create a `firebase.json` in your project root if you don't have one, and reference the `storage.rules` file:
+
+```json
+{
+	"storage": {"rules": "storage.rules"}
+}
+```
+
+	- Then run:
+
+```bash
+firebase use --add  # choose or add your 'prona360d' project id
+firebase deploy --only storage
+```
+
+Notes:
+- Ensure the firebase CLI is authenticated (`firebase login`) and you have permission to update rules for `prona360d`.
+- After deploying, try uploading again with the Admin UI while signed in — the upload helper will log the bucket + path and show toasts for errors.
 
 ## Firestore Data Model
 

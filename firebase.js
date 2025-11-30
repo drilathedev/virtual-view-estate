@@ -7,11 +7,11 @@ const firebaseConfig = {
   apiKey: "AIzaSyCJcbWJqAYDVhaKqOHDBOlCgDRPE8KGiqU",
   authDomain: "prona360-fdffd.firebaseapp.com",
   projectId: "prona360-fdffd",
-  storageBucket: "prona360-fdffd.firebasestorage.app",
+  storageBucket: "prona360d.firebasestorage.app",
   messagingSenderId: "13070047414",
   appId: "1:13070047414:web:a5fc2afd1153800f1fae17",
   measurementId: "G-HDWE7Q1WJD"
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const _analytics = getAnalytics(app);

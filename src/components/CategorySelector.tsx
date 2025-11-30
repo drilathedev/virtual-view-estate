@@ -32,7 +32,8 @@ export const CategorySelector = () => {
   return (
     <section className="py-16 bg-muted/30">
       <div className="container-custom">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Use 2 columns by default so the grid isn't single-column on mobile */}
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {categories.map((category, index) => (
             <Card
               key={index}

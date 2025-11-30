@@ -12,6 +12,12 @@ interface FirebaseServices {
 
 let services: FirebaseServices | null = null;
 
+// Export the configured storage bucket (accepts plain name or full gs:// URL)
+export const STORAGE_BUCKET_RAW = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string;
+export const STORAGE_BUCKET_URL = STORAGE_BUCKET_RAW && STORAGE_BUCKET_RAW.startsWith('gs://')
+  ? STORAGE_BUCKET_RAW
+  : `gs://${STORAGE_BUCKET_RAW}`;
+
 export function getFirebase(): FirebaseServices {
   if (services) return services;
 
@@ -48,7 +54,10 @@ export function getFirebase(): FirebaseServices {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const storage = getStorage(app);
+  // Ensure the Storage service explicitly targets the configured bucket.
+  // Accept either a plain bucket name (e.g. "prona360d.firebasestorage.app")
+  // or a full gs:// URL. getStorage(app, url) expects a gs:// URL.
+  const storage = getStorage(app, STORAGE_BUCKET_URL);
 
   services = { app, auth, db, storage };
   return services;

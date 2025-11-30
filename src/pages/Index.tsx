@@ -1,7 +1,9 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { CategorySelector } from "@/components/CategorySelector";
+// import { CategorySelector } from "@/components/CategorySelector";
 import { PropertyGrid } from "@/components/PropertyGrid";
+import Testimonials from '@/components/Testimonials';
+import InfoBoxes from '@/components/InfoBoxes';
 import { Footer } from "@/components/Footer";
 
 const Index = () => {
@@ -9,8 +11,11 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <Hero />
-      <CategorySelector />
       <PropertyGrid />
+      {/* Move category selector lower on the page (below properties) */}
+      {/* <CategorySelector /> */}
+      <InfoBoxes />
+      <Testimonials />
       <Footer />
     </div>
   );

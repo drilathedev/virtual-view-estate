@@ -33,21 +33,21 @@ export const Footer = () => {
                 <Link to="/" className="text-primary-foreground/80 hover:text-accent transition-colors">
                   Ballina
                 </Link>
-              </li>
               <li>
-                <Link to="/" className="text-primary-foreground/80 hover:text-accent transition-colors">
+                <Link to="/properties" className="text-primary-foreground/80 hover:text-accent transition-colors">
                   Prona
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-primary-foreground/80 hover:text-accent transition-colors">
+                <Link to="/services" className="text-primary-foreground/80 hover:text-accent transition-colors">
                   Vizualizimi 3D
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-primary-foreground/80 hover:text-accent transition-colors">
+                <Link to="/contact" className="text-primary-foreground/80 hover:text-accent transition-colors">
                   Rreth Nesh
                 </Link>
+              </li>
               </li>
             </ul>
           </div>

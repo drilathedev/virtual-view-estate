@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listProperties, createProperty, updateProperty, deleteProperty, Property, CreatePropertyInput } from '@/lib/properties';
 import { uploadFile } from '@/lib/storage';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { Navigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -33,6 +34,7 @@ interface FormState extends Omit<CreatePropertyInput, 'mediaType'> {
   mediaType: 'photo' | 'video' | '3d';
   description?: string;
   videoUrl?: string;
+  kuulaId?: string;
   gallery?: string[];
 }
 
@@ -48,11 +50,13 @@ const emptyForm: FormState = {
   image: '',
   description: '',
   videoUrl: '',
+  kuulaId: '',
   gallery: []
 };
 
 export default function Admin() {
-  const { isAdmin, loading, logout } = useAuth();
+  const { isAdmin, loading, logout, user } = useAuth();
+  const { toast } = useToast();
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -67,6 +71,17 @@ export default function Admin() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['properties'] });
       setForm(emptyForm);
+      toast({ title: 'Pronë u krijua', description: 'Lista e pronës u krijua me sukses.' });
+    },
+    onError: (err: unknown) => {
+      // Log full error details (including non-enumerable props like code) to help debugging
+      console.error('[create] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
+      const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
+      toast({ title: 'Krijimi dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
+    }
+    ,
+    onSettled: (data, err, vars, context) => {
+      console.log('[create] settled', { data, err, vars, context });
     }
   });
 
@@ -76,12 +91,31 @@ export default function Admin() {
       qc.invalidateQueries({ queryKey: ['properties'] });
       setForm(emptyForm);
       setEditingId(null);
+      toast({ title: 'Pronë u përditësua', description: 'Pronë u përditësua me sukses.' });
+    }
+    ,
+    onError: (err: unknown) => {
+      console.error('[update] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
+      const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
+      toast({ title: 'Përditësimi dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
+    },
+    onSettled: (data, err, vars, context) => {
+      console.log('[update] settled', { data, err, vars, context });
     }
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteProperty(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['properties'] })
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['properties'] }),
+    onError: (err: unknown) => {
+      console.error('[delete] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
+      const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
+      toast({ title: 'Fshirja dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
+    }
+    ,
+    onSettled: (data, err, vars, context) => {
+      console.log('[delete] settled', { data, err, vars, context });
+    }
   });
 
   function handleChange<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -102,6 +136,7 @@ export default function Admin() {
       image: p.image,
       description: p.description || '',
       videoUrl: p.videoUrl || '',
+      kuulaId: p.kuulaId || '',
       gallery: p.gallery || []
     });
   }
@@ -121,12 +156,24 @@ export default function Admin() {
       image: form.image,
       description: form.description,
       videoUrl: form.videoUrl,
+      kuulaId: form.kuulaId,
       gallery: form.gallery || []
     };
-    if (editingId) {
-      await updateMut.mutateAsync({ id: editingId, data: payload });
-    } else {
-      await createMut.mutateAsync(payload);
+    try {
+      // Race the mutation against a client-side timeout so UI can recover even if something unusual happens
+      const timeoutMs = 20000;
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error(`submit timed out after ${timeoutMs}ms`)), timeoutMs));
+
+      if (editingId) {
+        await Promise.race([updateMut.mutateAsync({ id: editingId, data: payload }), timeout]);
+      } else {
+        await Promise.race([createMut.mutateAsync(payload), timeout]);
+      }
+    } catch (err: unknown) {
+      // mutateAsync will throw if the mutation fails — catch it so the UI doesn't get stuck
+      console.error('[submit] mutation failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
+      const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
+      toast({ title: 'Ruajtja dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
     }
   }
 
@@ -136,10 +183,20 @@ export default function Admin() {
 
   async function handleImageFile(file?: File) {
     if (!file) return;
+      if (!user) {
+      toast({ title: 'Nuk jeni i kyçur', description: 'Ju lutem hyni për të ngarkuar fotografi.', variant: 'destructive' });
+      return;
+    }
     setUploadingImage(true);
     try {
       const url = await uploadFile(file, 'property-images');
       handleChange('image', url);
+      toast({ title: 'Foto e ngarkuar', description: 'Skedari u ngarkua në Storage.', });
+    } catch (err: unknown) {
+      console.error('[upload] image failed', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      toast({ title: 'Upload failed', description: msg, variant: 'destructive' });
+      return;
     } finally {
       setUploadingImage(false);
     }
@@ -147,11 +204,21 @@ export default function Admin() {
 
   async function handleVideoFile(file?: File) {
     if (!file) return;
+      if (!user) {
+      toast({ title: 'Nuk jeni i kyçur', description: 'Ju lutem hyni për të ngarkuar video.', variant: 'destructive' });
+      return;
+    }
     setUploadingVideo(true);
     try {
       const url = await uploadFile(file, 'property-videos');
       handleChange('videoUrl', url);
       handleChange('mediaType', 'video');
+      toast({ title: 'Video e ngarkuar', description: 'Skedari u ngarkua në Storage.' });
+    } catch (err: unknown) {
+      console.error('[upload] video failed', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      toast({ title: 'Upload failed', description: msg, variant: 'destructive' });
+      return;
     } finally {
       setUploadingVideo(false);
     }
@@ -179,15 +246,15 @@ export default function Admin() {
         <Card className="shadow-medium hover:shadow-hard transition-shadow">
           <CardHeader className="border-b bg-muted/50">
             <CardTitle className="flex items-center gap-3">
-              {editingId ? (
+                  {editingId ? (
                 <>
                   <Edit2 className="h-6 w-6 text-accent" />
-                  Edit Property
+                  Ndrysho Pronën
                 </>
               ) : (
                 <>
                   <Plus className="h-6 w-6 text-accent" />
-                  Create New Property
+                  Krijo Pronë të Re
                 </>
               )}
             </CardTitle>
@@ -204,7 +271,7 @@ export default function Admin() {
                   </h3>
                   <div className="space-y-4 p-4 rounded-lg border bg-card">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Property Title *</label>
+                      <label className="text-sm font-medium text-foreground">Titulli i Pronës *</label>
                       <Input 
                         placeholder="e.g., Luxury 2-Bedroom Apartment in City Center" 
                         value={form.title} 
@@ -214,9 +281,9 @@ export default function Admin() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Description</label>
+                      <label className="text-sm font-medium text-foreground">Përshkrimi</label>
                       <Textarea 
-                        placeholder="Detailed description of the property, amenities, and neighborhood..." 
+                        placeholder="Përshkrim i detajuar i pronës, pajisjet dhe lagjina..." 
                         value={form.description} 
                         onChange={e => handleChange('description', e.target.value)} 
                         className="min-h-[140px] resize-none" 
@@ -226,7 +293,7 @@ export default function Admin() {
                 </div>
                 {/* Property Details Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
+                    <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
                     <MapPin className="h-5 w-5 text-accent" />
                     Property Details
                   </h3>
@@ -235,7 +302,7 @@ export default function Admin() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
-                          Location *
+                          Vendndodhja *
                         </label>
                         <Input 
                           placeholder="Prishtinë, Kosovë" 
@@ -246,9 +313,9 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <DollarSign className="h-4 w-4 text-muted-foreground" />
-                          Price *
+                          Çmimi *
                         </label>
                         <Input 
                           placeholder="€120,000 or €800/month" 
@@ -262,9 +329,9 @@ export default function Admin() {
                     
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Bed className="h-4 w-4 text-muted-foreground" />
-                          Bedrooms *
+                          Dhoma Gjumi *
                         </label>
                         <Input 
                           type="number" 
@@ -277,9 +344,9 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Bath className="h-4 w-4 text-muted-foreground" />
-                          Bathrooms *
+                          Banjo *
                         </label>
                         <Input 
                           type="number" 
@@ -292,9 +359,9 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Square className="h-4 w-4 text-muted-foreground" />
-                          Area (m²) *
+                          Sipërfaqe (m²) *
                         </label>
                         <Input 
                           type="number" 
@@ -310,7 +377,7 @@ export default function Admin() {
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Status *</label>
+                        <label className="text-sm font-medium text-foreground">Statusi *</label>
                         <Select 
                           value={form.forRent ? 'yes' : 'no'} 
                           onValueChange={(value) => handleChange('forRent', value === 'yes')}
@@ -334,16 +401,16 @@ export default function Admin() {
                             <SelectValue placeholder="Select media type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="photo">📷 Photo</SelectItem>
-                            <SelectItem value="video">🎥 Video</SelectItem>
-                            <SelectItem value="3d">🎮 3D Tour</SelectItem>
+                            <SelectItem value="photo">📷 Foto</SelectItem>
+                              <SelectItem value="video">🎥 Video</SelectItem>
+                              <SelectItem value="3d">🎮 Tur 3D</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Gallery URLs (comma-separated)</label>
+                      <label className="text-sm font-medium text-foreground">URL-të e Galerisë (të ndara me presje)</label>
                       <Input
                         placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"
                         value={form.gallery?.join(', ') || ''}
@@ -367,7 +434,7 @@ export default function Admin() {
                   <div className="space-y-3 p-4 rounded-lg border bg-card">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
                       <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                      Main Image *
+                      Imazhi Kryesor *
                     </label>
                     <Input 
                       placeholder="Image URL" 
@@ -399,7 +466,7 @@ export default function Admin() {
                           ) : (
                             <>
                               <Upload className="h-4 w-4" />
-                              Upload Image
+                              Ngarko Foto
                             </>
                           )}
                         </Button>
@@ -423,7 +490,7 @@ export default function Admin() {
                   <div className="space-y-3 p-4 rounded-lg border bg-card">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
                       <Video className="h-4 w-4 text-muted-foreground" />
-                      Video (Optional)
+                      Video (Opsional)
                     </label>
                     <Input 
                       placeholder="Video URL" 
@@ -455,7 +522,7 @@ export default function Admin() {
                           ) : (
                             <>
                               <Upload className="h-4 w-4" />
-                              Upload Video
+                              Ngarko Video
                             </>
                           )}
                         </Button>
@@ -469,28 +536,61 @@ export default function Admin() {
                       />
                     )}
                   </div>
+
+                  {/* Kuula 3D Tour */}
+                  <div className="space-y-3 p-4 rounded-lg border bg-card">
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                      Kuula 3D Tour ID (Opsional)
+                    </label>
+                    <Input 
+                      placeholder="e.g., COLLECTION_ID from Kuula share link" 
+                      value={form.kuulaId} 
+                      onChange={e => handleChange('kuulaId', e.target.value)} 
+                      className="h-11"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Zgjidh 'Tur 3D' si Media Type dhe vendos Kuula collection ID-në tuaj. Merr ID-në nga URL e share linkut Kuula.
+                    </p>
+                    {form.kuulaId && form.mediaType === '3d' && (
+                      <div className="w-full rounded-lg overflow-hidden border border-border">
+                        <iframe
+                          src={`https://kuula.co/share/${form.kuulaId}?logo=1&info=1&logosize=200&infosize=280&imagewidth=100%&mapzoom=1`}
+                          style={{
+                            border: 'none',
+                            borderRadius: '8px',
+                          }}
+                          allow="fullscreen; accelerometer; autoplay; camera *; gyroscope; magnetometer; midi; payment *; usb *; xr-spatial-tracking *"
+                          allowFullScreen
+                          width="100%"
+                          height="300"
+                          title="Kuula 3D Preview"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
             
             {/* Form Actions */}
             <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-              <Button 
+                <Button 
                 type="submit" 
                 variant="hero" 
                 size="lg"
                 disabled={createMut.isPending || updateMut.isPending}
                 className="gap-2 flex-1 sm:flex-initial"
               >
-                {createMut.isPending || updateMut.isPending ? (
+                  {createMut.isPending || updateMut.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {editingId ? 'Updating...' : 'Creating...'}
+                    {editingId ? 'Po përditësohet...' : 'Po krijohet...'}
                   </>
                 ) : (
                   <>
                     {editingId ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                    {editingId ? 'Update Property' : 'Create Property'}
+                    {editingId ? 'Përditëso Pronën' : 'Krijo Pronën'}
                   </>
                 )}
               </Button>
@@ -502,7 +602,7 @@ export default function Admin() {
                   onClick={() => { setEditingId(null); setForm(emptyForm); }}
                   className="flex-1 sm:flex-initial"
                 >
-                  Cancel
+                  Anulo
                 </Button>
               )}
             </div>
@@ -516,7 +616,7 @@ export default function Admin() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3">
                 <Building2 className="h-6 w-6 text-accent" />
-                Properties ({properties.length})
+                Prona ({properties.length})
               </CardTitle>
               {properties.length > 0 && (
                 <Badge variant="secondary" className="text-sm">
@@ -526,10 +626,10 @@ export default function Admin() {
             </div>
           </CardHeader>
           <CardContent className="p-6">
-          {isLoading ? (
+              {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-4">
               <Loader2 className="h-12 w-12 animate-spin text-accent" />
-              <p className="text-muted-foreground">Loading properties...</p>
+              <p className="text-muted-foreground">Po ngarkohen pronat...</p>
             </div>
           ) : properties.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-4 text-center">
@@ -537,9 +637,9 @@ export default function Admin() {
                 <Building2 className="h-10 w-10 text-muted-foreground" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-semibold">No properties yet</h3>
+                <h3 className="text-xl font-semibold">Nuk ka prona akoma</h3>
                 <p className="text-muted-foreground max-w-sm">
-                  Get started by creating your first property listing above.
+                  Filloni duke krijuar listimin e parë të pronës në seksionin e sipërm.
                 </p>
               </div>
             </div>
@@ -547,14 +647,14 @@ export default function Admin() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b-2 bg-muted/30">
-                    <th className="py-3 px-4 font-semibold">Image</th>
-                    <th className="py-3 px-4 font-semibold">Property</th>
-                    <th className="py-3 px-4 font-semibold">Location</th>
-                    <th className="py-3 px-4 font-semibold">Price</th>
-                    <th className="py-3 px-4 font-semibold text-center">Details</th>
-                    <th className="py-3 px-4 font-semibold">Type</th>
-                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                    <tr className="text-left border-b-2 bg-muted/30">
+                    <th className="py-3 px-4 font-semibold">Foto</th>
+                    <th className="py-3 px-4 font-semibold">Pronë</th>
+                    <th className="py-3 px-4 font-semibold">Vendndodhja</th>
+                    <th className="py-3 px-4 font-semibold">Çmimi</th>
+                    <th className="py-3 px-4 font-semibold text-center">Detajet</th>
+                    <th className="py-3 px-4 font-semibold">Lloji</th>
+                    <th className="py-3 px-4 font-semibold text-right">Veprimet</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -573,7 +673,7 @@ export default function Admin() {
                           />
                           {p.forRent && (
                             <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5">
-                              Rent
+                              Me Qira
                             </Badge>
                           )}
                         </div>
@@ -631,14 +731,14 @@ export default function Admin() {
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex justify-end gap-2">
-                          <Button 
+                            <Button 
                             size="sm" 
                             variant="outline" 
                             onClick={() => startEdit(p)}
                             className="gap-1 hover:bg-accent hover:text-accent-foreground"
                           >
                             <Edit2 className="h-3 w-3" />
-                            Edit
+                            Ndrysho
                           </Button>
                           <Button 
                             size="sm" 
@@ -652,7 +752,7 @@ export default function Admin() {
                             ) : (
                               <Trash2 className="h-3 w-3" />
                             )}
-                            Delete
+                            Fshi
                           </Button>
                         </div>
                       </td>
