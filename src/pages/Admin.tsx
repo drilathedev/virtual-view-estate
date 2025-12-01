@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listProperties, createProperty, updateProperty, deleteProperty, Property, CreatePropertyInput } from '@/lib/properties';
+import { listProperties, createProperty, updateProperty, deleteProperty, Property, CreatePropertyInput, listPropertyFeatures, createPropertyFeature, deletePropertyFeature } from '@/lib/properties';
 import { uploadFile } from '@/lib/storage';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -9,6 +9,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Phone, Mail, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -29,13 +30,18 @@ import {
   LogOut,
   Loader2
 } from 'lucide-react';
+import { FeaturesInput } from '@/components/FeaturesInput';
 
 interface FormState extends Omit<CreatePropertyInput, 'mediaType'> {
-  mediaType: 'photo' | 'video' | '3d';
+  mediaType: 'photo' | 'video' | '3d' | 'land';
   description?: string;
   videoUrl?: string;
   kuulaId?: string;
   gallery?: string[];
+  featureName?: string;
+  phone?: string;
+  email?: string;
+  features: string[];
 }
 
 const emptyForm: FormState = {
@@ -51,7 +57,11 @@ const emptyForm: FormState = {
   description: '',
   videoUrl: '',
   kuulaId: '',
-  gallery: []
+  gallery: [],
+  featureName: '',
+  phone: '',
+  email: '',
+  features: []
 };
 
 export default function Admin() {
@@ -64,6 +74,11 @@ export default function Admin() {
   const { data: properties = [], isLoading } = useQuery({
     queryKey: ['properties'],
     queryFn: listProperties
+  });
+
+  const { data: features = [] } = useQuery({
+    queryKey: ['propertyFeatures'],
+    queryFn: listPropertyFeatures
   });
 
   const createMut = useMutation({
@@ -118,6 +133,22 @@ export default function Admin() {
     }
   });
 
+  const createFeatureMut = useMutation({
+    mutationFn: createPropertyFeature,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['propertyFeatures'] });
+      toast({ title: 'Feature created', description: 'Property feature added successfully.' });
+    }
+  });
+
+  const deleteFeatureMut = useMutation({
+    mutationFn: deletePropertyFeature,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['propertyFeatures'] });
+      toast({ title: 'Feature deleted', description: 'Property feature removed successfully.' });
+    }
+  });
+
   function handleChange<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm(f => ({ ...f, [key]: value }));
   }
@@ -137,7 +168,10 @@ export default function Admin() {
       description: p.description || '',
       videoUrl: p.videoUrl || '',
       kuulaId: p.kuulaId || '',
-      gallery: p.gallery || []
+      gallery: p.gallery || [],
+      phone: p.phone || '',
+      email: p.email || '',
+      features: p.features || []
     });
   }
 
@@ -157,7 +191,10 @@ export default function Admin() {
       description: form.description,
       videoUrl: form.videoUrl,
       kuulaId: form.kuulaId,
-      gallery: form.gallery || []
+      gallery: form.gallery || [],
+      phone: form.phone,
+      email: form.email,
+      features: Array.isArray(form.features) ? form.features : []
     };
     try {
       // Race the mutation against a client-side timeout so UI can recover even if something unusual happens
@@ -180,6 +217,7 @@ export default function Admin() {
   // Upload handlers
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
   async function handleImageFile(file?: File) {
     if (!file) return;
@@ -222,6 +260,35 @@ export default function Admin() {
     } finally {
       setUploadingVideo(false);
     }
+  }
+
+  async function handleGalleryFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    if (!user) {
+      toast({ title: 'Nuk jeni i kyçur', description: 'Ju lutem hyni për të ngarkuar fotografi.', variant: 'destructive' });
+      return;
+    }
+    setUploadingGallery(true);
+    try {
+      const uploadPromises = Array.from(files).map(file => uploadFile(file, 'property-gallery'));
+      const urls = await Promise.all(uploadPromises);
+      const currentGallery = form.gallery || [];
+      handleChange('gallery', [...currentGallery, ...urls]);
+      toast({ title: 'Fotot u ngarkuan', description: `${urls.length} foto u ngarkuan me sukses.` });
+    } catch (err: unknown) {
+      console.error('[upload] gallery failed', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      toast({ title: 'Upload failed', description: msg, variant: 'destructive' });
+    } finally {
+      setUploadingGallery(false);
+    }
+  }
+
+  function removeGalleryImage(index: number) {
+    const currentGallery = form.gallery || [];
+    const newGallery = currentGallery.filter((_, i) => i !== index);
+    handleChange('gallery', newGallery);
+    toast({ title: 'Foto u fshi', description: 'Fotoja u hoq nga galeria.' });
   }
 
   if (!loading && !isAdmin) return <Navigate to="/login" replace />;
@@ -302,10 +369,9 @@ export default function Admin() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
-                          Vendndodhja *
-                        </label>
+                          Vendndodhja *</label>
                         <Input 
-                          placeholder="Prishtinë, Kosovë" 
+                          placeholder="Shkruaj lokacionin..." 
                           value={form.location} 
                           onChange={e => handleChange('location', e.target.value)} 
                           className="h-11"
@@ -313,7 +379,7 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <DollarSign className="h-4 w-4 text-muted-foreground" />
                           Çmimi *
                         </label>
@@ -323,6 +389,30 @@ export default function Admin() {
                           onChange={e => handleChange('price', e.target.value)} 
                           className="h-11"
                           required 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          Numri i Kontaktit
+                        </label>
+                        <Input
+                          placeholder="049 123 456"
+                          value={form.phone}
+                          onChange={e => handleChange('phone', e.target.value)}
+                          className="h-11"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          Email i Pronës
+                        </label>
+                        <Input
+                          placeholder="info@prona360.com"
+                          value={form.email}
+                          onChange={e => handleChange('email', e.target.value)}
+                          className="h-11"
                         />
                       </div>
                     </div>
@@ -361,12 +451,12 @@ export default function Admin() {
                       <div className="space-y-2">
                           <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Square className="h-4 w-4 text-muted-foreground" />
-                          Sipërfaqe (m²) *
+                          Sipërfaqe {form.mediaType === 'land' ? '(ha)' : '(m²)'} *
                         </label>
                         <Input 
                           type="number" 
                           min={0} 
-                          placeholder="85" 
+                          placeholder={form.mediaType === 'land' ? '1.5' : '85'} 
                           value={form.area} 
                           onChange={e => handleChange('area', Number(e.target.value))} 
                           className="h-11"
@@ -392,30 +482,95 @@ export default function Admin() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Media Type *</label>
+                        <label className="text-sm font-medium text-foreground">Lloji i Pronës *</label>
                         <Select 
-                          value={form.mediaType} 
+                          value={form.mediaType}
                           onValueChange={(value) => handleChange('mediaType', value as FormState['mediaType'])}
                         >
                           <SelectTrigger className="h-11">
-                            <SelectValue placeholder="Select media type" />
+                            <SelectValue placeholder="Zgjidh llojin" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="photo">📷 Foto</SelectItem>
-                              <SelectItem value="video">🎥 Video</SelectItem>
-                              <SelectItem value="3d">🎮 Tur 3D</SelectItem>
+                            <SelectItem value="video">🎥 Video</SelectItem>
+                            <SelectItem value="3d">🎮 Tur 3D</SelectItem>
+                            <SelectItem value="land">🌱 Toka</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
+                    <div className="space-y-3 p-4 rounded-lg border bg-card">
+                      <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                        Galeria e Fotove (Shumë Foto)
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="flex-1">
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            multiple
+                            onChange={e => handleGalleryFiles(e.target.files)} 
+                            className="hidden"
+                            id="gallery-upload"
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="w-full gap-2" 
+                            onClick={() => document.getElementById('gallery-upload')?.click()}
+                            disabled={uploadingGallery}
+                          >
+                            {uploadingGallery ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Duke ngarkuar...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="h-4 w-4" />
+                                Ngarko Shumë Foto
+                              </>
+                            )}
+                          </Button>
+                        </label>
+                      </div>
+                      {form.gallery && form.gallery.length > 0 && (
+                        <div className="grid grid-cols-2 gap-2 mt-3">
+                          {form.gallery.map((url, idx) => (
+                            <div key={idx} className="relative group">
+                              <img 
+                                src={url} 
+                                alt={`gallery-${idx}`} 
+                                className="w-full h-24 object-cover rounded-lg border-2 border-accent/20" 
+                              />
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="destructive"
+                                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => removeGalleryImage(idx)}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Zgjidhni shumë foto për të krijuar një galeri. Këto do të shfaqen në faqen e detajeve të pronës.
+                      </p>
+                    </div>
+
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">URL-të e Galerisë (të ndara me presje)</label>
-                      <Input
-                        placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"
-                        value={form.gallery?.join(', ') || ''}
-                        onChange={e => handleChange('gallery', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                        className="h-11"
+                      <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <Check className="h-4 w-4 text-muted-foreground" />
+                        Tiparet e Pronës
+                      </label>
+                      <FeaturesInput
+                        value={form.features}
+                        onChange={features => handleChange('features', features)}
                       />
                     </div>
                   </div>
@@ -764,6 +919,8 @@ export default function Admin() {
           )}
           </CardContent>
         </Card>
+
+        
       </main>
       <Footer />
     </div>

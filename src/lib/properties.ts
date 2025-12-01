@@ -20,6 +20,9 @@ export interface Property {
   gallery?: string[]; // additional image URLs
   createdAt?: Date;
   updatedAt?: Date;
+  phone?: string; // contact number
+  email?: string; // property email
+  features?: string[]; // property features
 }
 
 const propertiesCol = collection(db, 'properties');
@@ -42,7 +45,10 @@ function mapDoc(d: DocumentSnapshot): Property {
     description: data.description,
     gallery: data.gallery,
     createdAt: data.createdAt?.toDate?.() ?? undefined,
-    updatedAt: data.updatedAt?.toDate?.() ?? undefined
+    updatedAt: data.updatedAt?.toDate?.() ?? undefined,
+    phone: data.phone ?? '',
+    email: data.email ?? '',
+    features: data.features ?? []
   };
 }
 
@@ -116,4 +122,34 @@ export async function deleteProperty(id: string): Promise<void> {
     console.error('[lib/properties] deleteProperty failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
     throw err;
   }
+}
+
+export interface PropertyFeature {
+  id: string;
+  name: string;
+}
+
+const featuresCol = collection(db, 'propertyFeatures');
+
+function mapFeatureDoc(d: DocumentSnapshot): PropertyFeature {
+  const data = d.data();
+  return {
+    id: d.id,
+    name: data.name,
+  };
+}
+
+export async function listPropertyFeatures(): Promise<PropertyFeature[]> {
+  const snap = await getDocs(featuresCol);
+  return snap.docs.map(mapFeatureDoc);
+}
+
+export async function createPropertyFeature(name: string): Promise<string> {
+  const docRef = await addDoc(featuresCol, { name });
+  return docRef.id;
+}
+
+export async function deletePropertyFeature(id: string): Promise<void> {
+  const ref = doc(featuresCol, id);
+  await deleteDoc(ref);
 }

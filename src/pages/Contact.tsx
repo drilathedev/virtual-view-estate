@@ -14,7 +14,12 @@ const Contact = () => {
             <h1 className="text-3xl font-bold text-center">Na Kontaktoni</h1>
             <p className="text-muted-foreground text-center">Për pyetje ose kërkesa specifike, na dërgoni një mesazh dhe ne do t'ju kontaktojmë sa më shpejt.</p>
 
-            <div className="p-6 rounded-lg border bg-card">
+            <div className="p-6 rounded-lg border bg-card space-y-6">
+              <div className="text-center space-y-2">
+                <div className="font-semibold text-lg">Për të listuar një pronë:</div>
+                <div className="text-base">Email: <a href="mailto:prona360ks@gmail.com" className="text-accent underline">prona360ks@gmail.com</a></div>
+                <div className="text-base">Numri: <a href="tel:049295636" className="text-accent underline">049295636</a></div>
+              </div>
               <form className="space-y-4">
                 <Input placeholder="Emri juaj" className="h-11" />
                 <Input type="email" placeholder="Email" className="h-11" />

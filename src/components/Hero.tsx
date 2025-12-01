@@ -3,8 +3,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import heroImage from "@/assets/hero-bg.jpg";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
+  const [location, setLocation] = useState("");
+  const [type, setType] = useState("");
+  const [price, setPrice] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (location) params.set("location", location);
+    if (type) params.set("type", type);
+    if (price) {
+      // Map price select value to min/max
+      if (price === "0-50k") { params.set("priceMin", "0"); params.set("priceMax", "50000"); }
+      else if (price === "50k-100k") { params.set("priceMin", "50000"); params.set("priceMax", "100000"); }
+      else if (price === "100k-200k") { params.set("priceMin", "100000"); params.set("priceMax", "200000"); }
+      else if (price === "200k+") { params.set("priceMin", "200000"); }
+    }
+    navigate(`/properties?${params.toString()}`);
+  };
   return (
     <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -39,11 +59,13 @@ export const Hero = () => {
               <Input 
                 placeholder="Lokacioni..." 
                 className="h-12 bg-white/90 border-white/20"
+                value={location}
+                onChange={e => setLocation(e.target.value)}
               />
             </div>
             
             <div className="md:col-span-3">
-              <Select>
+              <Select value={type} onValueChange={setType}>
                 <SelectTrigger className="h-12 bg-white/90 border-white/20">
                   <SelectValue placeholder="Lloji" />
                 </SelectTrigger>
@@ -52,12 +74,13 @@ export const Hero = () => {
                   <SelectItem value="house">Shtëpi</SelectItem>
                   <SelectItem value="villa">Vilë</SelectItem>
                   <SelectItem value="penthouse">Penthouse</SelectItem>
+                  <SelectItem value="land">Toka</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="md:col-span-3">
-              <Select>
+              <Select value={price} onValueChange={setPrice}>
                 <SelectTrigger className="h-12 bg-white/90 border-white/20">
                   <SelectValue placeholder="Çmimi" />
                 </SelectTrigger>
@@ -71,7 +94,7 @@ export const Hero = () => {
             </div>
 
             <div className="md:col-span-2">
-              <Button variant="hero" size="lg" className="w-full h-12">
+              <Button variant="hero" size="lg" className="w-full h-12" onClick={handleSearch}>
                 <Search className="h-5 w-5" />
                 Kërko
               </Button>

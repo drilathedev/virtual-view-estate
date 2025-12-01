@@ -9,6 +9,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useState } from "react";
 import { 
   MapPin, 
   Bed, 
@@ -24,7 +26,10 @@ import {
   Check,
   Loader2,
   AlertCircle,
-  Image as ImageIcon
+  Image as ImageIcon,
+  X,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import property1 from "@/assets/property-1.jpg";
 import property2 from "@/assets/property-2.jpg";
@@ -108,6 +113,9 @@ const demoProperties: Record<string, any> = {
 
 export default function PropertyDetail() {
   const { id } = useParams();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
   const { data: property, isLoading, isError } = useQuery({
     queryKey: ["property", id],
     queryFn: async () => {
@@ -182,13 +190,35 @@ export default function PropertyDetail() {
               playsInline
             />
           ) : (
-            <img
-              src={property.image || property1}
-              alt={property.title}
-              className="w-full h-[70vh] object-cover scale-105 hover:scale-100 transition-transform duration-700"
-            />
+            <div 
+              className="relative cursor-pointer group"
+              onClick={() => {
+                if (property.gallery && property.gallery.length > 0) {
+                  setCurrentImageIndex(0);
+                  setLightboxOpen(true);
+                }
+              }}
+            >
+              <img
+                src={(property.gallery && property.gallery.length > 0 ? property.gallery[0] : property.image) || property1}
+                alt={property.title}
+                className="w-full h-[70vh] object-cover scale-105 hover:scale-100 transition-transform duration-700"
+              />
+              {property.gallery && property.gallery.length > 0 && (
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-4 shadow-2xl">
+                    <ImageIcon className="h-10 w-10 text-accent" />
+                  </div>
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Badge className="bg-accent text-white px-6 py-2 text-base shadow-xl">
+                      Shiko {property.gallery.length} Foto
+                    </Badge>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent pointer-events-none" />
           
           {/* Floating Action Buttons */}
           <div className="absolute top-6 right-6 flex gap-3 animate-fade-in">
@@ -216,6 +246,9 @@ export default function PropertyDetail() {
               <div className="lg:col-span-2 space-y-8">
                 {/* Header */}
                 <div className="space-y-6 animate-fade-in">
+                  {/* 3D Tour Section - move above description and quick stats */}
+                
+
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                     <div className="flex-1 space-y-3">
                       <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">{property.title}</h1>
@@ -225,41 +258,61 @@ export default function PropertyDetail() {
                       </div>
                     </div>
                     <div className="text-left lg:text-right space-y-2">
-                      <div className="text-4xl lg:text-5xl font-bold gradient-text">{property.price}</div>
-                      {property.forRent && <div className="text-muted-foreground text-lg">per month</div>}
+                      <div className="text-4xl lg:text-5xl font-bold gradient-text">
+                        {property.price.startsWith('€') ? property.price : `€${property.price}`}
+                      </div>
+                      {property.forRent && <div className="text-muted-foreground text-lg">për muaj</div>}
                     </div>
                   </div>
-
+{property?.kuulaId && property.mediaType === '3d' && (
+  <Card className="shadow-medium hover:shadow-hard transition-shadow p-0 overflow-hidden mt-6">
+    <CardHeader className="border-b">
+      <CardTitle className="flex items-center gap-2">
+        <span className="text-2xl">🎮</span>
+        Tur 3D Interaktiv
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="p-6">
+      <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
+    </CardContent>
+  </Card>
+)}
                   {/* Quick Stats */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-6 border-y">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Bed className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold">{property.beds}</div>
-                        <div className="text-xs text-muted-foreground">Bedrooms</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Bath className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold">{property.baths}</div>
-                        <div className="text-xs text-muted-foreground">Bathrooms</div>
-                      </div>
-                    </div>
+                    {property.mediaType !== 'land' && (
+                      <>
+                        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                            <Bed className="h-5 w-5 text-accent" />
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold">{property.beds}</div>
+                            <div className="text-xs text-muted-foreground">Dhoma gjumi</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                          <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                            <Bath className="h-5 w-5 text-accent" />
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold">{property.baths}</div>
+                            <div className="text-xs text-muted-foreground">Banjo</div>
+                          </div>
+                        </div>
+                      </>
+                    )}
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
                         <Square className="h-5 w-5 text-accent" />
                       </div>
                       <div>
                         <div className="text-2xl font-bold">{property.area}</div>
-                        <div className="text-xs text-muted-foreground">m² Area</div>
+                        <div className="text-xs text-muted-foreground">
+                          {property.mediaType === 'land' ? 'Sipërfaqe (Hektarë)' : 'Sipërfaqe (m²)'}
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    {/* <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
                         <Calendar className="h-5 w-5 text-accent" />
                       </div>
@@ -276,7 +329,7 @@ export default function PropertyDetail() {
                         <div className="text-2xl font-bold">2</div>
                         <div className="text-xs text-muted-foreground">Parking</div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -305,20 +358,7 @@ export default function PropertyDetail() {
                   </Card>
                 )}
 
-                {/* Optional 3D Tour Section */}
-                {property?.kuulaId && property.mediaType === '3d' && (
-                  <Card className="shadow-medium hover:shadow-hard transition-shadow p-0 overflow-hidden">
-                    <CardHeader className="border-b">
-                      <CardTitle className="flex items-center gap-2">
-                        <span className="text-2xl">🎮</span>
-                        Tur 3D Interaktiv
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
-                    </CardContent>
-                  </Card>
-                )}
+                {/* ...existing code... */}
 
                 {/* Gallery Section */}
                 {property.gallery && property.gallery.length > 0 && (
@@ -326,19 +366,28 @@ export default function PropertyDetail() {
                     <CardHeader className="border-b">
                           <CardTitle className="flex items-center gap-2">
                             <ImageIcon className="h-6 w-6 text-accent" />
-                            Galeri Fotografish ({property.gallery.length})
+                            Fotot ({property.gallery.length})
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {property.gallery.map((url, idx) => (
-                          <div key={idx} className="group relative aspect-video overflow-hidden rounded-lg">
+                          <div 
+                            key={idx} 
+                            className="group relative aspect-video overflow-hidden rounded-lg cursor-pointer"
+                            onClick={() => {
+                              setCurrentImageIndex(idx);
+                              setLightboxOpen(true);
+                            }}
+                          >
                             <img 
                               src={url} 
-                              alt={`gallery-${idx}`} 
+                              alt={`${property.title} - Foto ${idx + 1}`} 
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
                             />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                              <ImageIcon className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -356,17 +405,7 @@ export default function PropertyDetail() {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {[
-                        "Central Heating",
-                        "Air Conditioning",
-                        "Large Balcony",
-                        "Elevator",
-                        "Fiber Internet",
-                        "24/7 Security",
-                        "Furnished",
-                        "Modern Appliances",
-                        "City View"
-                      ].map((feature, index) => (
+                      {(property.features && property.features.length > 0) ? property.features.map((feature: string, index: number) => (
                         <div 
                           key={index}
                           className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
@@ -376,80 +415,47 @@ export default function PropertyDetail() {
                           </div>
                           <span className="text-sm font-medium">{feature}</span>
                         </div>
-                      ))}
+                      )) : <span className="text-muted-foreground">Nuk ka tipare të listuara për këtë pronë.</span>}
                     </div>
                   </CardContent>
                 </Card>
-
-                {/* Map Placeholder */}
+                {/* Lokacioni Card with Google Maps embed */}
                 <Card className="p-6 space-y-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
                   <h2 className="text-2xl font-bold">Lokacioni</h2>
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <MapPin className="h-12 w-12 text-muted-foreground" />
+                  <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center border border-accent/30 shadow-lg">
+                    <iframe
+                      title="Google Maps"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0, borderRadius: '12px', minHeight: '220px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}
+                      loading="lazy"
+                      allowFullScreen
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={`https://www.google.com/maps?q=${encodeURIComponent(property.location)}&output=embed`}
+                    />
                   </div>
                 </Card>
+
+                {/* ...existing code... */}
               </div>
 
               {/* Sidebar - Contact Form */}
               <div className="lg:col-span-1">
                 <Card className="shadow-medium hover:shadow-hard transition-shadow sticky top-24 animate-scale-in">
                   <CardHeader className="border-b">
-                    <CardTitle className="text-lg">A jeni të interesuar për këtë pronë?</CardTitle>
+                    <CardTitle className="text-lg">Kontakti i Pronës</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6 space-y-6">
-                  
-                  <form className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Full Name</label>
-                      <Input placeholder="John Doe" className="h-11" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Email</label>
-                      <Input type="email" placeholder="john@example.com" className="h-11" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Phone</label>
-                      <Input type="tel" placeholder="+383 44 123 456" className="h-11" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Message</label>
-                      <Textarea 
-                        placeholder="Jam i/e interesuar për këtë pronë..." 
-                        className="min-h-[100px] resize-none"
-                      />
-                    </div>
-                    <Button variant="hero" size="lg" className="w-full gap-2">
-                      <Mail className="h-4 w-4" />
-                      Send Message
-                    </Button>
-                  </form>
-
-                  <div className="border-t pt-6 space-y-3">
-                    <p className="text-sm font-medium text-center">Or contact us directly:</p>
-                    <a href="tel:+38344123456" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <Phone className="h-5 w-5 text-accent" />
+                        <span className="font-semibold text-base">{property.phone ? property.phone : 'Nuk ka numër të listuar'}</span>
                       </div>
-                      <div className="text-left">
-                        <div className="text-xs text-muted-foreground">Call us</div>
-                        <div className="font-semibold">+383 44 123 456</div>
-                      </div>
-                    </a>
-                    <a href="mailto:info@prona360.com" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <Mail className="h-5 w-5 text-accent" />
+                        <span className="font-semibold text-base">{property.email ? property.email : 'info@prona360.com'}</span>
                       </div>
-                      <div className="text-left">
-                        <div className="text-xs text-muted-foreground">Email us</div>
-                        <div className="font-semibold text-sm">info@prona360.com</div>
-                      </div>
-                    </a>
-                  </div>
-
-                  {/* <Button variant="premium" size="lg" className="w-full gap-2">
-                    <Home className="h-5 w-5" />
-                    Schedule Virtual Tour
-                  </Button> */}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -460,6 +466,82 @@ export default function PropertyDetail() {
 
       <Footer />
       </>
+      )}
+
+      {/* Image Lightbox Modal */}
+      {property && property.gallery && property.gallery.length > 0 && (
+        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+          <DialogContent className="max-w-7xl w-full p-0 bg-black/95 border-none">
+            <div className="relative w-full h-[90vh] flex items-center justify-center">
+              {/* Close Button */}
+              <Button
+                size="icon"
+                variant="ghost"
+                className="absolute top-4 right-4 z-50 text-white hover:bg-white/10"
+                onClick={() => setLightboxOpen(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+
+              {/* Previous Button */}
+              {property.gallery.length > 1 && (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="absolute left-4 z-50 text-white hover:bg-white/10 disabled:opacity-30"
+                  onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? property.gallery!.length - 1 : prev - 1))}
+                >
+                  <ChevronLeft className="h-8 w-8" />
+                </Button>
+              )}
+
+              {/* Image */}
+              <img
+                src={property.gallery[currentImageIndex]}
+                alt={`${property.title} - Foto ${currentImageIndex + 1}`}
+                className="max-w-full max-h-full object-contain"
+              />
+
+              {/* Next Button */}
+              {property.gallery.length > 1 && (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="absolute right-4 z-50 text-white hover:bg-white/10 disabled:opacity-30"
+                  onClick={() => setCurrentImageIndex((prev) => (prev === property.gallery!.length - 1 ? 0 : prev + 1))}
+                >
+                  <ChevronRight className="h-8 w-8" />
+                </Button>
+              )}
+
+              {/* Image Counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+                {currentImageIndex + 1} / {property.gallery.length}
+              </div>
+
+              {/* Thumbnail Strip */}
+              {property.gallery.length > 1 && (
+                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-[90vw] pb-2">
+                  {property.gallery.map((url, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                        idx === currentImageIndex ? 'border-accent scale-110' : 'border-white/30 opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img
+                        src={url}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
