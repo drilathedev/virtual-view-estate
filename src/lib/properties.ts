@@ -90,7 +90,6 @@ export async function createProperty(data: CreatePropertyInput): Promise<string>
     });
 
     const docRef = await withTimeout(promise, 15000);
-    console.log('[lib/properties] createProperty succeeded', { id: docRef.id });
     return docRef.id;
   } catch (err: unknown) {
     console.error('[lib/properties] createProperty failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
@@ -106,7 +105,6 @@ export async function updateProperty(id: string, data: UpdatePropertyInput): Pro
       ...data,
       updatedAt: serverTimestamp()
     }), 15000);
-    console.log('[lib/properties] updateProperty succeeded', { id });
   } catch (err: unknown) {
     console.error('[lib/properties] updateProperty failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
     throw err;
@@ -117,7 +115,6 @@ export async function deleteProperty(id: string): Promise<void> {
   try {
     const ref = doc(db, 'properties', id);
     await withTimeout(deleteDoc(ref), 15000);
-    console.log('[lib/properties] deleteProperty succeeded', { id });
   } catch (err: unknown) {
     console.error('[lib/properties] deleteProperty failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
     throw err;

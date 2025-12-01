@@ -94,10 +94,6 @@ export default function Admin() {
       const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
       toast({ title: 'Krijimi dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
     }
-    ,
-    onSettled: (data, err, vars, context) => {
-      console.log('[create] settled', { data, err, vars, context });
-    }
   });
 
   const updateMut = useMutation({
@@ -113,9 +109,6 @@ export default function Admin() {
       console.error('[update] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
       const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
       toast({ title: 'Përditësimi dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
-    },
-    onSettled: (data, err, vars, context) => {
-      console.log('[update] settled', { data, err, vars, context });
     }
   });
 
@@ -126,10 +119,6 @@ export default function Admin() {
       console.error('[delete] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
       const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
       toast({ title: 'Fshirja dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
-    }
-    ,
-    onSettled: (data, err, vars, context) => {
-      console.log('[delete] settled', { data, err, vars, context });
     }
   });
 

@@ -41,14 +41,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAdmin = !!(user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase()));
 
-  // Debug aid (remove in production): log when auth state changes and admin detection fails.
-  useEffect(() => {
-    if (!loading) {
-      // eslint-disable-next-line no-console
-      console.log('[auth] user:', user?.email, 'isAdmin:', isAdmin, 'allowlist:', ADMIN_EMAILS);
-    }
-  }, [user, loading, isAdmin]);
-
   return (
     <AuthContext.Provider value={{ user, loading, isAdmin, login, logout }}>
       {children}
