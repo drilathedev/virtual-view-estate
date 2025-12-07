@@ -24,10 +24,10 @@ const mediaIcons = {
 };
 
 const mediaColors = {
-  photo: "bg-blue-500",
-  video: "bg-purple-500",
-  "3d": "bg-accent",
-  land: "bg-green-700",
+  photo: "bg-blue-600",
+  video: "bg-purple-600",
+  "3d": "bg-cyan-600",
+  land: "bg-emerald-600",
 };
 
 export const PropertyCard = ({ 
@@ -43,56 +43,71 @@ export const PropertyCard = ({
   forRent = false 
 }: PropertyCardProps) => {
   const MediaIcon = mediaIcons[mediaType];
+  
   return (
-      <Link to={`/property/${id}`}>
-        <Card className="overflow-hidden group cursor-pointer hover-lift border-none shadow-soft hover:shadow-hard transition-all">
-          <div className="relative aspect-[4/3] overflow-hidden">
-            <img 
-              src={image} 
-              alt={title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            />
-            {/* Media Type Badge */}
-            <div className={`absolute top-4 right-4 ${mediaColors[mediaType]} text-white px-3 py-1.5 rounded-full flex items-center gap-2 shadow-lg`}>
-              {MediaIcon ? <MediaIcon className="h-4 w-4" /> : null}
-              <span className="text-xs font-semibold uppercase">{mediaType}</span>
-            </div>
-            {/* Rent/Sale Badge */}
-            {forRent && (
-              <Badge className="absolute top-4 left-4 bg-green-500 text-white border-none">
-                Me Qira
-              </Badge>
-            )}
+    <Link to={`/property/${id}`} className="group block">
+      <Card className="overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 rounded-lg bg-white">
+        {/* Image Container */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+          <img 
+            src={image} 
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          
+          {/* Media Type Badge */}
+          <div className={`absolute top-3 right-3 ${mediaColors[mediaType]} text-white px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 shadow`}>
+            {MediaIcon ? <MediaIcon className="h-3.5 w-3.5" /> : null}
+            <span className="uppercase">{mediaType}</span>
           </div>
-          <div className="p-5 space-y-4">
+          
+          {/* Rent/Sale Badge */}
+          {forRent && (
+            <Badge className="absolute top-3 left-3 bg-emerald-600 text-white border-none px-2.5 py-1 text-xs font-medium">
+              Me Qira
+            </Badge>
+          )}
+        </div>
+        
+        {/* Content */}
+        <div className="p-5 space-y-3 bg-white">
+          <div className="space-y-1.5">
+            <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+              {title}
+            </h3>
+            <div className="flex items-center text-gray-600 text-sm">
+              <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+              <span className="line-clamp-1">{location}</span>
+            </div>
+          </div>
+          
+          {/* Features */}
+          <div className="flex items-center justify-between text-sm text-gray-600 py-3 border-t border-gray-100">
+            <div className="flex items-center gap-1">
+              <Bed className="h-4 w-4" />
+              <span>{beds}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Bath className="h-4 w-4" />
+              <span>{baths}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Square className="h-4 w-4" />
+              <span>{mediaType === 'land' ? `${area} ha` : `${area} m²`}</span>
+            </div>
+          </div>
+          
+          {/* Price */}
+          <div className="flex items-center justify-between pt-2">
             <div>
-              <h3 className="font-bold text-xl mb-2 group-hover:text-accent transition-colors line-clamp-1">
-                {title}
-              </h3>
-              <div className="flex items-center text-muted-foreground text-sm">
-                <MapPin className="h-4 w-4 mr-1" />
-                {location}
+              <div className="text-2xl font-bold text-gray-900">
+                €{price}
               </div>
-            </div>
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Bed className="h-4 w-4" />
-                <span>{beds}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Bath className="h-4 w-4" />
-                <span>{baths}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Square className="h-4 w-4" />
-                <span>{mediaType === 'land' ? `${area} ha` : `${area} m²`}</span>
-              </div>
-            </div>
-            <div className="pt-4 border-t">
-              <div className="text-2xl font-bold text-primary">€ {price}</div>
+              {forRent && <span className="text-xs text-gray-500">/muaj</span>}
             </div>
           </div>
-        </Card>
-      </Link>
+        </div>
+      </Card>
+    </Link>
   );
 };

@@ -13,9 +13,9 @@ export function Kuula3DViewer({ kuulaId, title }: Kuula3DViewerProps) {
   }
 
   return (
-    <div className="w-full rounded-lg overflow-hidden border border-border shadow-sm">
+    <div className="w-full rounded-lg overflow-hidden border border-border shadow-sm relative">
       <iframe
-        src={`https://kuula.co/share/${kuulaId}?logo=1&info=1&logosize=200&infosize=280&imagewidth=100%&mapzoom=1`}
+        src={`https://kuula.co/share/${kuulaId}?logo=-1&info=0&fs=0&vr=0&thumbs=-1&keys=0`}
         style={{
           border: 'none',
           borderRadius: '8px',

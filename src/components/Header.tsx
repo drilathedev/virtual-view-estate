@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input';
 import { Link } from "react-router-dom";
+import logo from '@/assets/prona360logo.png';
 
 export const Header = () => {
     const [open, setOpen] = useState(false);
@@ -23,42 +24,40 @@ export const Header = () => {
       return () => window.removeEventListener('keydown', onKey);
     }, []);
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
       <div className="container-custom">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between py-3">
           <Link to="/" className="flex items-center gap-2">
-            <div className="text-2xl font-bold gradient-text">
-              PRONA360
-            </div>
+            <img src={logo} alt="PRONA360" className="h-10 w-auto object-contain" />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-sm font-medium hover:text-accent transition-colors">
+          <nav className="hidden md:flex items-center gap-1">
+            <Link to="/" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
               Ballina
             </Link>
-            <Link to="/properties" className="text-sm font-medium hover:text-accent transition-colors">
+            <Link to="/properties" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
               Prona
             </Link>
-            <Link to="/services" className="text-sm font-medium hover:text-accent transition-colors">
+            <Link to="/services" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
               Shërbime
             </Link>
-            <Link to="/contact" className="text-sm font-medium hover:text-accent transition-colors">
+            <Link to="/contact" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
               Kontakt
             </Link>
           </nav>
 
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="hidden md:flex">
+            <Button variant="ghost" size="icon" className="hidden md:flex hover:bg-gray-100 rounded-md">
               <Search className="h-5 w-5" />
             </Button>
             {/* User login removed — only admin may authenticate via /login */}
             <Link to="/contact">
-                <Button variant="premium" size="sm">Listo Pronën</Button>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2">Listo Pronën</Button>
             </Link>
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="md:hidden hover:bg-gray-100 rounded-md"
               aria-expanded={open}
               aria-controls="mobile-menu"
               onClick={() => setOpen(v => !v)}

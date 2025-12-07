@@ -398,7 +398,7 @@ export default function Admin() {
                           Email i Pronës
                         </label>
                         <Input
-                          placeholder="info@prona360.com"
+                          placeholder="prona360rks@gmail.com"
                           value={form.email}
                           onChange={e => handleChange('email', e.target.value)}
                           className="h-11"

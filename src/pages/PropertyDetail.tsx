@@ -174,16 +174,16 @@ export default function PropertyDetail() {
       ) : (
       <>
       <main className="pt-16">
-        {/* Hero Image Section */}
+        {/* Hero Media Section */}
         <section className="relative bg-muted overflow-hidden">
           {property.mediaType === '3d' && property.kuulaId ? (
-            <div className="h-[70vh]">
+            <div className="h-[60vh]">
               <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
             </div>
           ) : property.videoUrl && property.mediaType === 'video' ? (
             <video
               src={property.videoUrl}
-              className="w-full h-[70vh] object-cover"
+              className="w-full h-[60vh] object-cover"
               autoPlay
               muted
               loop
@@ -200,9 +200,9 @@ export default function PropertyDetail() {
               }}
             >
               <img
-                src={(property.gallery && property.gallery.length > 0 ? property.gallery[0] : property.image) || property1}
+                src={property.image || (property.gallery && property.gallery.length > 0 ? property.gallery[0] : property1)}
                 alt={property.title}
-                className="w-full h-[70vh] object-cover scale-105 hover:scale-100 transition-transform duration-700"
+                className="w-full h-[60vh] object-cover scale-105 hover:scale-100 transition-transform duration-700"
               />
               {property.gallery && property.gallery.length > 0 && (
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -218,20 +218,14 @@ export default function PropertyDetail() {
               )}
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent pointer-events-none" />
           
-          {/* Floating Action Buttons */}
-          <div className="absolute top-6 right-6 flex gap-3 animate-fade-in">
-            <Button size="icon" variant="secondary" className="rounded-full shadow-xl hover:scale-110 transition-transform backdrop-blur-sm bg-white/90">
-              <Share2 className="h-5 w-5" />
-            </Button>
-            <Button size="icon" variant="secondary" className="rounded-full shadow-xl hover:scale-110 transition-transform backdrop-blur-sm bg-white/90">
-              <Heart className="h-5 w-5" />
-            </Button>
-          </div>
+          {/* Gradient Overlay - Only show when NOT 3D */}
+          {!(property.mediaType === '3d' && property.kuulaId) && (
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent pointer-events-none" />
+          )}
 
           {/* Property Badge */}
-          <div className="absolute top-6 left-6">
+          <div className="absolute top-6 left-6 z-10">
             <Badge className={`text-sm px-4 py-2 ${property.forRent ? 'bg-green-500' : 'bg-blue-500'} text-white shadow-xl`}>
               {property.forRent ? '🏠 Me Qira' : '🏘️ Në Shitje'}
             </Badge>
@@ -246,9 +240,6 @@ export default function PropertyDetail() {
               <div className="lg:col-span-2 space-y-8">
                 {/* Header */}
                 <div className="space-y-6 animate-fade-in">
-                  {/* 3D Tour Section - move above description and quick stats */}
-                
-
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                     <div className="flex-1 space-y-3">
                       <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">{property.title}</h1>
@@ -264,19 +255,6 @@ export default function PropertyDetail() {
                       {property.forRent && <div className="text-muted-foreground text-lg">për muaj</div>}
                     </div>
                   </div>
-{property?.kuulaId && property.mediaType === '3d' && (
-  <Card className="shadow-medium hover:shadow-hard transition-shadow p-0 overflow-hidden mt-6">
-    <CardHeader className="border-b">
-      <CardTitle className="flex items-center gap-2">
-        <span className="text-2xl">🎮</span>
-        Tur 3D Interaktiv
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="p-6">
-      <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
-    </CardContent>
-  </Card>
-)}
                   {/* Quick Stats */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-6 border-y">
                     {property.mediaType !== 'land' && (
@@ -453,7 +431,7 @@ export default function PropertyDetail() {
                       </div>
                       <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <Mail className="h-5 w-5 text-accent" />
-                        <span className="font-semibold text-base">{property.email ? property.email : 'info@prona360.com'}</span>
+                        <span className="font-semibold text-base">{property.email ? property.email : 'prona360rks@gmail.com'}</span>
                       </div>
                     </div>
                   </CardContent>
