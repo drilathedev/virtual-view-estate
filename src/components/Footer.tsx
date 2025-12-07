@@ -90,7 +90,7 @@ export const Footer = () => {
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
                   <MapPin className="h-4 w-4" />
                 </div>
-                <span>Prishtinë, Kosovë</span>
+                <span>Drenas, Kosovë</span>
               </li>
             </ul>
           </div>

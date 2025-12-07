@@ -118,7 +118,7 @@ ${message}
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">Lokacioni</h3>
                   <p className="text-gray-600">
-                    Prishtinë, Kosovë
+                    Drenas, Kosovë
                   </p>
                 </div>
               </div>
