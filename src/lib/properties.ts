@@ -59,9 +59,18 @@ export async function listProperties(): Promise<Property[]> {
 }
 
 export async function getProperty(id: string): Promise<Property | null> {
-  const ref = doc(db, 'properties', id);
-  const snap = await getDoc(ref);
-  return snap.exists() ? mapDoc(snap) : null;
+  try {
+    const ref = doc(db, 'properties', id);
+    const snap = await getDoc(ref);
+    return snap.exists() ? mapDoc(snap) : null;
+  } catch (error: any) {
+    console.error('getProperty error:', error);
+    // Check if it's a network/firewall issue
+    if (error?.code === 'unavailable' || error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      throw new Error('Network error: Firebase may be blocked in your region');
+    }
+    throw error;
+  }
 }
 
 export type CreatePropertyInput = Omit<Property, 'id' | 'createdAt' | 'updatedAt'>;

@@ -51,16 +51,22 @@ export function getFirebase(): FirebaseServices {
     console.warn('[firebase] apiKey looks unusual – double check value.');
   }
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  // Ensure the Storage service explicitly targets the configured bucket.
-  // Accept either a plain bucket name (e.g. "prona360d.firebasestorage.app")
-  // or a full gs:// URL. getStorage(app, url) expects a gs:// URL.
-  const storage = getStorage(app, STORAGE_BUCKET_URL);
+  try {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    // Ensure the Storage service explicitly targets the configured bucket.
+    // Accept either a plain bucket name (e.g. "prona360d.firebasestorage.app")
+    // or a full gs:// URL. getStorage(app, url) expects a gs:// URL.
+    const storage = getStorage(app, STORAGE_BUCKET_URL);
 
-  services = { app, auth, db, storage };
-  return services;
+    services = { app, auth, db, storage };
+    return services;
+  } catch (error: any) {
+    console.error('[firebase] Failed to initialize Firebase:', error);
+    // Re-throw with more context
+    throw new Error(`Firebase initialization failed: ${error?.message || 'Unknown error'}. This may be due to network restrictions in your region.`);
+  }
 }
 
 export const app = getFirebase().app;

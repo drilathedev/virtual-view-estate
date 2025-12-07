@@ -29,7 +29,11 @@ import {
   Image as ImageIcon,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  Maximize2,
+  MousePointer2,
+  Move3d
 } from "lucide-react";
 import property1 from "@/assets/property-1.jpg";
 import property2 from "@/assets/property-2.jpg";
@@ -115,8 +119,9 @@ export default function PropertyDetail() {
   const { id } = useParams();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [show3DFallback, setShow3DFallback] = useState(false);
   
-  const { data: property, isLoading, isError } = useQuery({
+  const { data: property, isLoading, isError, error } = useQuery({
     queryKey: ["property", id],
     queryFn: async () => {
       if (!id) throw new Error("No property ID provided");
@@ -131,14 +136,30 @@ export default function PropertyDetail() {
         }
       }
       
-      // Try to fetch from Firestore
-      const result = await getProperty(id);
-      if (!result) throw new Error("Pronë nuk u gjet");
-      return result;
+      // Try to fetch from Firestore with timeout
+      try {
+        const result = await getProperty(id);
+        if (!result) throw new Error("Pronë nuk u gjet");
+        return result;
+      } catch (err: any) {
+        console.error('Error fetching property:', err);
+        // If Firebase is blocked, throw a specific error
+        if (err?.code === 'permission-denied' || err?.message?.includes('timeout') || err?.message?.includes('network')) {
+          throw new Error('SERVICE_UNAVAILABLE');
+        }
+        throw err;
+      }
     },
     enabled: !!id,
-    retry: 1,
-    staleTime: 5000
+    retry: (failureCount, error: any) => {
+      // Don't retry if service is unavailable in region
+      if (error?.message === 'SERVICE_UNAVAILABLE') return false;
+      return failureCount < 2;
+    },
+    retryDelay: 1000,
+    staleTime: 5000,
+    gcTime: 10000,
+    networkMode: 'online'
   });
 
   return (
@@ -160,14 +181,27 @@ export default function PropertyDetail() {
                 <AlertCircle className="h-8 w-8 text-red-600" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold">Pronë Nuk U Gjet</h2>
+                <h2 className="text-2xl font-bold">
+                  {error?.message === 'SERVICE_UNAVAILABLE' 
+                    ? 'Shërbimi Nuk Është i Disponueshëm' 
+                    : 'Pronë Nuk U Gjet'}
+                </h2>
                 <p className="text-muted-foreground">
-                  Pronë e pa-gjetur ose është hequr.
+                  {error?.message === 'SERVICE_UNAVAILABLE'
+                    ? 'Shërbimi mund të jetë i bllokuar në rajonin tuaj. Ju lutemi provoni përsëri më vonë ose kontaktoni mbështetjen.'
+                    : 'Pronë e pa-gjetur ose është hequr.'}
                 </p>
               </div>
-              <Button variant="hero" onClick={() => window.history.back()}>
-                Go Back
-              </Button>
+              <div className="flex gap-2 justify-center">
+                <Button variant="hero" onClick={() => window.history.back()}>
+                  Kthehu Mbrapa
+                </Button>
+                {error?.message === 'SERVICE_UNAVAILABLE' && (
+                  <Button variant="outline" onClick={() => window.location.reload()}>
+                    Rifreskoni Faqen
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -176,11 +210,7 @@ export default function PropertyDetail() {
       <main className="pt-16">
         {/* Hero Media Section */}
         <section className="relative bg-muted overflow-hidden">
-          {property.mediaType === '3d' && property.kuulaId ? (
-            <div className="h-[60vh]">
-              <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
-            </div>
-          ) : property.videoUrl && property.mediaType === 'video' ? (
+          {property.videoUrl && property.mediaType === 'video' ? (
             <video
               src={property.videoUrl}
               className="w-full h-[60vh] object-cover"
@@ -219,16 +249,22 @@ export default function PropertyDetail() {
             </div>
           )}
           
-          {/* Gradient Overlay - Only show when NOT 3D */}
-          {!(property.mediaType === '3d' && property.kuulaId) && (
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent pointer-events-none" />
-          )}
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent pointer-events-none" />
 
           {/* Property Badge */}
           <div className="absolute top-6 left-6 z-10">
             <Badge className={`text-sm px-4 py-2 ${property.forRent ? 'bg-green-500' : 'bg-blue-500'} text-white shadow-xl`}>
               {property.forRent ? '🏠 Me Qira' : '🏘️ Në Shitje'}
             </Badge>
+          </div>
+
+          {/* Scroll Down Indicator */}
+          <div className="absolute bottom-8 left-0 right-0 z-10 flex flex-col items-center gap-2 animate-bounce px-4">
+            <span className="text-white text-sm md:text-base font-medium drop-shadow-lg px-4 py-2 bg-black/40 rounded-full backdrop-blur-sm text-center">
+              Scroll poshtë për të parë pronën
+            </span>
+            <ChevronDown className="h-8 w-8 text-white drop-shadow-lg" />
           </div>
         </section>
 
@@ -255,6 +291,52 @@ export default function PropertyDetail() {
                       {property.forRent && <div className="text-muted-foreground text-lg">për muaj</div>}
                     </div>
                   </div>
+                  
+                  {/* 3D Tour Section - Clean & Professional */}
+                  {property?.kuulaId && property.mediaType === '3d' && (
+                    <Card className="shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden animate-fade-in border border-accent/20">
+                      <CardHeader className="bg-gradient-to-r from-accent/8 to-transparent border-b border-accent/10 pb-5">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-4 text-xl md:text-2xl">
+                            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                              <Move3d className="h-6 w-6 text-accent" />
+                            </div>
+                            <div>
+                              <span className="font-bold">Tur Virtual 360°</span>
+                              <p className="text-sm font-normal text-muted-foreground mt-0.5">
+                                Eksploroni pronën në detaje
+                              </p>
+                            </div>
+                          </CardTitle>
+                          <Badge variant="outline" className="hidden md:flex items-center gap-1.5 px-3 py-1.5 border-accent/30 bg-accent/5">
+                            <MousePointer2 className="h-3.5 w-3.5 text-accent" />
+                            <span className="text-xs">Interaktiv</span>
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div className="h-[500px] md:h-[650px] lg:h-[750px] bg-muted/30">
+                          <Kuula3DViewer kuulaId={property.kuulaId} title={property.title} />
+                        </div>
+                      </CardContent>
+                      <div className="px-5 py-3 bg-muted/30 border-t border-border/50">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <div className="flex items-center gap-4">
+                            <span className="flex items-center gap-1.5">
+                              <Check className="h-3.5 w-3.5 text-accent" />
+                              HD Quality
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Maximize2 className="h-3.5 w-3.5 text-accent" />
+                              Full Screen
+                            </span>
+                          </div>
+                          <span className="text-accent font-medium">● Live</span>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+
                   {/* Quick Stats */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 py-6 border-y">
                     {property.mediaType !== 'land' && (
