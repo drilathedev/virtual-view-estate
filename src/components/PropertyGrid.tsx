@@ -28,7 +28,20 @@ export const PropertyGrid = () => {
     let match = true;
     if (q && !p.title.toLowerCase().includes(q) && !p.location.toLowerCase().includes(q)) match = false;
     if (location && !p.location.toLowerCase().includes(location)) match = false;
-    if (type && p.mediaType && p.mediaType.toLowerCase() !== type) match = false;
+    // `type` query param is used for property category (apartment/shtepi/vile/penthouse)
+    if (type) {
+      const propType = (p as any).type?.toLowerCase();
+      // If property has explicit `type` field, match it
+      if (propType) {
+        if (propType !== type) match = false;
+      } else {
+        // Fallback: try matching title, description or features for the keyword
+        const inTitle = p.title?.toLowerCase().includes(type);
+        const inDesc = (p as any).description?.toLowerCase().includes(type);
+        const inFeatures = p.features?.some(f => f.toLowerCase().includes(type));
+        if (!inTitle && !inDesc && !inFeatures) match = false;
+      }
+    }
     if (priceMin && parseFloat(p.price.replace(/[^\d.]/g, '')) < priceMin) match = false;
     if (priceMax && parseFloat(p.price.replace(/[^\d.]/g, '')) > priceMax) match = false;
     if (forRent === 'rent' && !p.forRent) match = false;

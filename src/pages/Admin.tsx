@@ -34,6 +34,7 @@ import { FeaturesInput } from '@/components/FeaturesInput';
 
 interface FormState extends Omit<CreatePropertyInput, 'mediaType'> {
   mediaType: 'photo' | 'video' | '3d' | 'land';
+  type?: string; // apartment | house | villa | penthouse | land
   description?: string;
   videoUrl?: string;
   kuulaId?: string;
@@ -52,6 +53,7 @@ const emptyForm: FormState = {
   baths: 0,
   area: 0,
   mediaType: 'photo',
+  type: '',
   forRent: false,
   image: '',
   description: '',
@@ -152,6 +154,7 @@ export default function Admin() {
       baths: p.baths,
       area: p.area,
       mediaType: p.mediaType,
+        type: (p as any).type || '',
       forRent: p.forRent || false,
       image: p.image,
       description: p.description || '',
@@ -175,6 +178,7 @@ export default function Admin() {
       baths: form.baths,
       area: form.area,
       mediaType: form.mediaType,
+      type: form.type,
       forRent: form.forRent,
       image: form.image,
       description: form.description,
@@ -471,7 +475,7 @@ export default function Admin() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Lloji i Pronës *</label>
+                        <label className="text-sm font-medium text-foreground">Lloji i Mediave *</label>
                         <Select 
                           value={form.mediaType}
                           onValueChange={(value) => handleChange('mediaType', value as FormState['mediaType'])}
@@ -487,6 +491,22 @@ export default function Admin() {
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="text-sm font-medium text-foreground">Tipi i Pronës (Kategori) *</label>
+                      <Select value={form.type || ''} onValueChange={(v) => handleChange('type', v)}>
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Zgjidh kategorinë" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="apartment">Apartament</SelectItem>
+                          <SelectItem value="house">Shtëpi</SelectItem>
+                          <SelectItem value="villa">Vilë</SelectItem>
+                          <SelectItem value="penthouse">Penthouse</SelectItem>
+                          <SelectItem value="land">Toka</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="space-y-3 p-4 rounded-lg border bg-card">

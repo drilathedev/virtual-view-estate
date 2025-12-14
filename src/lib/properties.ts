@@ -12,6 +12,7 @@ export interface Property {
   baths: number;
   area: number; // square meters
   mediaType: MediaType;
+  type?: string; // e.g. apartment, shtepi, vile, penthouse (optional)
   forRent?: boolean;
   image: string; // main image URL
   videoUrl?: string; // optional video URL
@@ -38,6 +39,7 @@ function mapDoc(d: DocumentSnapshot): Property {
     baths: data.baths,
     area: data.area,
     mediaType: data.mediaType,
+    type: data.type ?? undefined,
     forRent: data.forRent,
     image: data.image,
     videoUrl: data.videoUrl,

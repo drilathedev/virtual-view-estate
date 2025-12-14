@@ -162,6 +162,8 @@ export default function PropertyDetail() {
     networkMode: 'online'
   });
 
+ 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <Header />
@@ -259,17 +261,24 @@ export default function PropertyDetail() {
             </Badge>
           </div>
 
-          {/* Scroll Down Indicator */}
+          {/* Scroll Down Indicator - clickable */}
           <div className="absolute bottom-8 left-0 right-0 z-10 flex flex-col items-center gap-2 animate-bounce px-4">
-            <span className="text-white text-sm md:text-base font-medium drop-shadow-lg px-4 py-2 bg-black/40 rounded-full backdrop-blur-sm text-center">
+            <button
+              onClick={() => {
+                const el = document.getElementById('property-details');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              aria-label="Scroll to property details"
+              className="text-white text-sm md:text-base font-medium drop-shadow-lg px-4 py-2 bg-black/40 rounded-full backdrop-blur-sm text-center hover:bg-black/50 transition"
+            >
               Scroll poshtë për të parë pronën
-            </span>
+            </button>
             <ChevronDown className="h-8 w-8 text-white drop-shadow-lg" />
           </div>
         </section>
 
         {/* Content Section */}
-        <section className="py-12">
+        <section id="property-details" className="py-12">
           <div className="container-custom">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content */}
