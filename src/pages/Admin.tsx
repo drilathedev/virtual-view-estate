@@ -43,6 +43,7 @@ interface FormState extends Omit<CreatePropertyInput, 'mediaType'> {
   phone?: string;
   email?: string;
   features: string[];
+  order?: number;
 }
 
 const emptyForm: FormState = {
@@ -63,7 +64,8 @@ const emptyForm: FormState = {
   featureName: '',
   phone: '',
   email: '',
-  features: []
+  features: [],
+  order: 999
 };
 
 export default function Admin() {
@@ -163,7 +165,8 @@ export default function Admin() {
       gallery: p.gallery || [],
       phone: p.phone || '',
       email: p.email || '',
-      features: p.features || []
+      features: p.features || [],
+      order: (p as any).order || 999
     });
   }
 
@@ -187,7 +190,8 @@ export default function Admin() {
       gallery: form.gallery || [],
       phone: form.phone,
       email: form.email,
-      features: Array.isArray(form.features) ? form.features : []
+      features: Array.isArray(form.features) ? form.features : [],
+      order: form.order
     };
     try {
       // Race the mutation against a client-side timeout so UI can recover even if something unusual happens
@@ -407,6 +411,21 @@ export default function Admin() {
                           onChange={e => handleChange('email', e.target.value)}
                           className="h-11"
                         />
+                      </div>
+                    </div>
+                    
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">Renditja e Shfaqjes (1 = Parë, 2 = Dytë, etj.)</label>
+                        <Input 
+                          type="number" 
+                          min={1} 
+                          placeholder="999" 
+                          value={form.order === undefined || form.order === 999 ? '' : form.order} 
+                          onChange={e => handleChange('order', e.target.value === '' ? undefined : Number(e.target.value))} 
+                          className="h-11"
+                        />
+                        <p className="text-xs text-muted-foreground">Pronë me numër më të ulët shfaqet e para. Pa vlerë = 999 (në fund)</p>
                       </div>
                     </div>
                     
@@ -818,6 +837,7 @@ export default function Admin() {
                     <th className="py-3 px-4 font-semibold">Çmimi</th>
                     <th className="py-3 px-4 font-semibold text-center">Detajet</th>
                     <th className="py-3 px-4 font-semibold">Lloji</th>
+                    <th className="py-3 px-4 font-semibold">Renditje</th>
                     <th className="py-3 px-4 font-semibold text-right">Veprimet</th>
                   </tr>
                 </thead>
@@ -891,6 +911,11 @@ export default function Admin() {
                           {p.mediaType === 'video' && '🎥'}
                           {p.mediaType === '3d' && '🎮'}
                           {' '}{p.mediaType.toUpperCase()}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge variant="secondary" className="font-mono">
+                          #{(p as any).order || 999}
                         </Badge>
                       </td>
                       <td className="py-4 px-4">

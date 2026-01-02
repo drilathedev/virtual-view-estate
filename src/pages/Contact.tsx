@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { sendToTelegram } from '@/lib/telegram';
 
 const Contact = () => {
   const [name, setName] = useState('');
@@ -31,6 +32,16 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      // Send to Telegram
+      const telegramSent = await sendToTelegram({
+        name,
+        email,
+        phone,
+        subject: 'Contact Form Inquiry',
+        message,
+        date: new Date().toISOString(),
+      });
+
       // Create email body
       const emailBody = `
 Emri: ${name}
@@ -47,10 +58,17 @@ ${message}
       // Open email client
       window.location.href = mailtoLink;
       
-      toast({
-        title: "Email klienti u hap!",
-        description: "Ju lutem dërgoni email-in nga aplikacioni juaj i email-it.",
-      });
+      if (telegramSent) {
+        toast({
+          title: "Faleminderit!",
+          description: "Mesazhi juaj u dërgua me sukses. Do të kontaktoheni shpejt.",
+        });
+      } else {
+        toast({
+          title: "Mesazhi u dërgua",
+          description: "Do të kontaktoheni shpejt.",
+        });
+      }
       
       // Reset form after a short delay
       setTimeout(() => {

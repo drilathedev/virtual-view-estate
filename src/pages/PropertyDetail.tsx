@@ -4,6 +4,7 @@ import { getProperty } from "@/lib/properties";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Kuula3DViewer } from "@/components/Kuula3DViewer";
+import { PropertyInquiryForm } from "@/components/PropertyInquiryForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -510,23 +511,10 @@ export default function PropertyDetail() {
 
               {/* Sidebar - Contact Form */}
               <div className="lg:col-span-1">
-                <Card className="shadow-medium hover:shadow-hard transition-shadow sticky top-24 animate-scale-in">
-                  <CardHeader className="border-b">
-                    <CardTitle className="text-lg">Kontakti i Pronës</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-6 space-y-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                        <Phone className="h-5 w-5 text-accent" />
-                        <span className="font-semibold text-base">{property.phone ? property.phone : 'Nuk ka numër të listuar'}</span>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                        <Mail className="h-5 w-5 text-accent" />
-                        <span className="font-semibold text-base">{property.email ? property.email : 'prona360rks@gmail.com'}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PropertyInquiryForm
+                  propertyId={property.id}
+                  propertyTitle={property.title}
+                />
               </div>
             </div>
           </div>

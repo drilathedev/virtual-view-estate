@@ -24,6 +24,7 @@ export interface Property {
   phone?: string; // contact number
   email?: string; // property email
   features?: string[]; // property features
+  order?: number; // display order (lower = first)
 }
 
 const propertiesCol = collection(db, 'properties');
@@ -50,14 +51,35 @@ function mapDoc(d: DocumentSnapshot): Property {
     updatedAt: data.updatedAt?.toDate?.() ?? undefined,
     phone: data.phone ?? '',
     email: data.email ?? '',
-    features: data.features ?? []
+    features: data.features ?? [],
+    order: data.order ?? 999
   };
 }
 
 export async function listProperties(): Promise<Property[]> {
-  const q = query(propertiesCol, orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  return snap.docs.map(mapDoc);
+  const snap = await getDocs(propertiesCol);
+  const properties = snap.docs.map(mapDoc);
+  // Sort: properties without order first (newest first), then properties with order numbers
+  return properties.sort((a, b) => {
+    const orderA = a.order ?? -1; // -1 means no order set
+    const orderB = b.order ?? -1;
+    
+    // Both have no order: sort by createdAt descending (newest first)
+    if (orderA === -1 && orderB === -1) {
+      const dateA = a.createdAt?.getTime() ?? 0;
+      const dateB = b.createdAt?.getTime() ?? 0;
+      return dateB - dateA;
+    }
+    
+    // Only A has no order: A comes first
+    if (orderA === -1) return -1;
+    
+    // Only B has no order: B comes first
+    if (orderB === -1) return 1;
+    
+    // Both have orders: sort by order ascending
+    return orderA - orderB;
+  });
 }
 
 export async function getProperty(id: string): Promise<Property | null> {
