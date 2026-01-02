@@ -1,13 +1,9 @@
 /**
  * Telegram Integration Module
- * Handles sending notifications to Telegram chat
+ * Uses Vercel serverless functions to keep bot token secure
  */
 
-// Configuration from environment variables
-const TELEGRAM_BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID;
-
-// Data type definition
+// Data type definitions
 export interface ContactData {
   name: string;
   email: string;
@@ -33,19 +29,13 @@ export interface PropertyInquiryData {
 }
 
 /**
- * Main function to send a contact message to Telegram
+ * Main function to send a message to Telegram via Vercel Function
  * @param data - Contact or inquiry data
  * @returns Promise<boolean> - true if sent successfully, false otherwise
  */
 export const sendToTelegram = async (
   data: ContactData | PropertyInquiryData
 ): Promise<boolean> => {
-  // Check if bot token and chat ID are configured
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-    console.warn('Telegram bot not configured. Message not sent to Telegram.');
-    return false;
-  }
-
   try {
     // Format the message based on data type
     let message: string;
@@ -55,28 +45,24 @@ export const sendToTelegram = async (
       message = formatPropertyInquiryMessage(data as PropertyInquiryData);
     }
 
-    // Send message to Telegram
-    const response = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: message,
-          parse_mode: 'HTML',
-        }),
-      }
-    );
+    // Call Vercel Function (not Telegram API directly)
+    const response = await fetch('/api/sendTelegram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+      }),
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Telegram API error:', errorData);
+      console.error('Telegram send error:', errorData);
       return false;
     }
 
+    const result = await response.json();
     console.log('Message sent to Telegram successfully');
     return true;
   } catch (error) {
@@ -174,27 +160,21 @@ ${data.message}
 
 /**
  * Test Telegram connection
- * Verifies bot token is valid by calling getMe endpoint
+ * Note: Can only be tested from server-side now (Vercel Function)
  */
 export const testTelegramConnection = async (): Promise<boolean> => {
-  if (!TELEGRAM_BOT_TOKEN) {
-    console.error('Telegram bot token not configured');
-    return false;
-  }
-
   try {
-    const response = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe`
-    );
-    const data = await response.json();
+    const response = await fetch('/api/sendTelegram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: '<b>Test Message</b>\n\nIf you see this, Telegram is connected!',
+      }),
+    });
 
-    if (data.ok) {
-      console.log('Telegram bot connection successful:', data.result);
-      return true;
-    } else {
-      console.error('Telegram bot connection failed:', data);
-      return false;
-    }
+    return response.ok;
   } catch (error) {
     console.error('Error testing Telegram connection:', error);
     return false;
@@ -206,8 +186,8 @@ export const testTelegramConnection = async (): Promise<boolean> => {
  */
 export const configureTelegramBot = (botToken: string, chatId: string) => {
   console.log('To configure the Telegram bot:');
-  console.log('1. Add to .env file:');
+  console.log('1. Add to Vercel environment variables:');
   console.log(`   VITE_TELEGRAM_BOT_TOKEN=${botToken}`);
   console.log(`   VITE_TELEGRAM_CHAT_ID=${chatId}`);
-  console.log('2. Restart your development server');
+  console.log('2. Redeploy on Vercel');
 };
