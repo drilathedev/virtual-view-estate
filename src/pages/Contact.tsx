@@ -42,22 +42,6 @@ const Contact = () => {
         date: new Date().toISOString(),
       });
 
-      // Create email body
-      const emailBody = `
-Emri: ${name}
-Email: ${email}
-Telefon: ${phone || 'Nuk është dhënë'}
-
-Mesazhi:
-${message}
-      `.trim();
-
-      // Create mailto link
-      const mailtoLink = `mailto:prona360rks@gmail.com?subject=Mesazh nga ${encodeURIComponent(name)}&body=${encodeURIComponent(emailBody)}`;
-      
-      // Open email client
-      window.location.href = mailtoLink;
-      
       if (telegramSent) {
         toast({
           title: "Faleminderit!",
