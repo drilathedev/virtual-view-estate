@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from '@/assets/prona360logo.png';
 
@@ -25,9 +25,6 @@ export const Footer = () => {
               </a>
               <a href="https://instagram.com/prona360rks" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:scale-110 transition-all duration-300">
                 <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-blue-700 hover:scale-110 transition-all duration-300">
-                <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
