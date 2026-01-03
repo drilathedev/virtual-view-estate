@@ -20,10 +20,10 @@ export const Footer = () => {
               Platforma më moderne e pasurive të paluajtshme me vizualizim 3D dhe tura virtuale.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all duration-300">
+              <a href="https://www.facebook.com/share/1G9MhN9teb/?mibextid=wwXlfr" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all duration-300">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:scale-110 transition-all duration-300">
+              <a href="https://instagram.com/prona360rks" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:scale-110 transition-all duration-300">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="#" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-blue-700 hover:scale-110 transition-all duration-300">
