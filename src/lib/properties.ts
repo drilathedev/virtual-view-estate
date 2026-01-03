@@ -7,6 +7,8 @@ export interface Property {
   id: string;
   title: string;
   location: string;
+  latitude?: number; // geographic latitude for map display
+  longitude?: number; // geographic longitude for map display
   price: string; // e.g. "€120,000" or "€2,500/muaj"
   beds: number;
   baths: number;
@@ -35,6 +37,8 @@ function mapDoc(d: DocumentSnapshot): Property {
     id: d.id,
     title: data.title,
     location: data.location,
+    latitude: data.latitude,
+    longitude: data.longitude,
     price: data.price,
     beds: data.beds,
     baths: data.baths,

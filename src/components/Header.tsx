@@ -38,6 +38,9 @@ export const Header = () => {
             <Link to="/properties" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
               Prona
             </Link>
+            <Link to="/properties-map" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+              Harta
+            </Link>
             <Link to="/services" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
               Shërbime
             </Link>
@@ -106,6 +109,7 @@ export const Header = () => {
                 </div>
                 <Link to="/" onClick={() => setOpen(false)} className="px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Ballina</Link>
                 <Link to="/properties" onClick={() => setOpen(false)} className="px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Prona</Link>
+                <Link to="/properties-map" onClick={() => setOpen(false)} className="px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Harta</Link>
                 <Link to="/services" onClick={() => setOpen(false)} className="px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Shërbime</Link>
                 <Link to="/contact" onClick={() => setOpen(false)} className="px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">Kontakt</Link>
               </nav>

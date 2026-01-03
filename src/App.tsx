@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import Properties from "./pages/Properties";
+import PropertiesMap from "./pages/PropertiesMap";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/properties" element={<Properties />} />
+            <Route path="/properties-map" element={<PropertiesMap />} />
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />

@@ -44,6 +44,8 @@ interface FormState extends Omit<CreatePropertyInput, 'mediaType'> {
   email?: string;
   features: string[];
   order?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 const emptyForm: FormState = {
@@ -65,7 +67,9 @@ const emptyForm: FormState = {
   phone: '',
   email: '',
   features: [],
-  order: 999
+  order: 999,
+  latitude: undefined,
+  longitude: undefined
 };
 
 export default function Admin() {
@@ -387,6 +391,30 @@ export default function Admin() {
                           className="h-11"
                           required 
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">Gjerësia Gjeografike (Latitude)</label>
+                        <Input 
+                          type="number" 
+                          step="0.0001"
+                          placeholder="42.6026" 
+                          value={form.latitude === undefined ? '' : form.latitude} 
+                          onChange={e => handleChange('latitude', e.target.value === '' ? undefined : Number(e.target.value))} 
+                          className="h-11"
+                        />
+                        <p className="text-xs text-muted-foreground">P.sh. për Drenën: 42.6400, për Prishtinën: 42.6026</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">Gjatësia Gjeografike (Longitude)</label>
+                        <Input 
+                          type="number" 
+                          step="0.0001"
+                          placeholder="21.1584" 
+                          value={form.longitude === undefined ? '' : form.longitude} 
+                          onChange={e => handleChange('longitude', e.target.value === '' ? undefined : Number(e.target.value))} 
+                          className="h-11"
+                        />
+                        <p className="text-xs text-muted-foreground">P.sh. për Drenën: 20.9500, për Prishtinën: 21.1584</p>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground flex items-center gap-2">
