@@ -1,5 +1,22 @@
 import { collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, DocumentSnapshot } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, isFirebaseConfigured } from './firebase';
+import demo1 from '@/assets/property-1.jpg';
+import demo2 from '@/assets/property-2.jpg';
+import demo3 from '@/assets/property-3.jpg';
+
+// Local preview fallback. Used when Firebase is not configured (no env vars) or
+// when running against the placeholder demo project, so the design can be
+// reviewed with sample data. Never triggers against a real, configured project.
+const DEMO_PROJECT_ID = 'demo-prona360';
+const DEMO_PROPERTIES: Property[] = [
+  { id: 'demo-1', title: 'Apartament modern në qendër', location: 'Prishtinë, Qendra', price: '185,000', beds: 3, baths: 2, area: 96, mediaType: '3d', type: 'apartment', forRent: false, image: demo1, rating: 4.9, reviews: 202, latitude: 42.6629, longitude: 21.1655, features: ['Ballkon', 'Parking', 'Ngrohje qendrore'] },
+  { id: 'demo-2', title: 'Vilë luksoze me oborr', location: 'Prishtinë, Veternik', price: '420,000', beds: 5, baths: 3, area: 240, mediaType: 'video', type: 'villa', forRent: false, image: demo2, rating: 5.0, reviews: 148, latitude: 42.6411, longitude: 21.1322, features: ['Kopsht', 'Garazh', 'Pamje'] },
+  { id: 'demo-3', title: 'Penthouse me pamje panoramike', location: 'Prizren, Qendra', price: '2,500', beds: 2, baths: 2, area: 110, mediaType: 'photo', type: 'penthouse', forRent: true, image: demo3, rating: 4.8, reviews: 96, latitude: 42.2139, longitude: 20.7397, features: ['Tarracë', 'Lift', 'Klimë'] },
+  { id: 'demo-4', title: 'Studio elegante pranë liqenit', location: 'Pejë, Qendra', price: '850', beds: 1, baths: 1, area: 48, mediaType: '3d', type: 'apartment', forRent: true, image: demo1, rating: 4.7, reviews: 64, latitude: 42.6592, longitude: 20.2887, features: ['Mobiluar', 'Internet'] },
+  { id: 'demo-5', title: 'Shtëpi familjare me kopsht', location: 'Ferizaj', price: '155,000', beds: 4, baths: 2, area: 165, mediaType: 'photo', type: 'house', forRent: false, image: demo2, rating: 4.9, reviews: 121, latitude: 42.3705, longitude: 21.1553, features: ['Kopsht', 'Bodrum'] },
+  { id: 'demo-6', title: 'Apartament i ri me ballkon', location: 'Gjakovë', price: '98,000', beds: 2, baths: 1, area: 72, mediaType: 'video', type: 'apartment', forRent: false, image: demo3, rating: 4.6, reviews: 53, latitude: 42.3803, longitude: 20.4308, features: ['Ballkon', 'Parking'] },
+];
+const useDemoData = !isFirebaseConfigured || (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) === DEMO_PROJECT_ID;
 
 export type MediaType = 'photo' | 'video' | '3d';
 
@@ -27,6 +44,8 @@ export interface Property {
   email?: string; // property email
   features?: string[]; // property features
   order?: number; // display order (lower = first)
+  rating?: number; // average review rating (0-5)
+  reviews?: number; // number of reviews
 }
 
 const propertiesCol = collection(db, 'properties');
@@ -56,11 +75,14 @@ function mapDoc(d: DocumentSnapshot): Property {
     phone: data.phone ?? '',
     email: data.email ?? '',
     features: data.features ?? [],
-    order: data.order ?? 999
+    order: data.order ?? 999,
+    rating: data.rating ?? undefined,
+    reviews: data.reviews ?? undefined
   };
 }
 
 export async function listProperties(): Promise<Property[]> {
+  if (useDemoData) return DEMO_PROPERTIES;
   const snap = await getDocs(propertiesCol);
   const properties = snap.docs.map(mapDoc);
   // Sort: properties without order first (newest first), then properties with order numbers
@@ -87,6 +109,7 @@ export async function listProperties(): Promise<Property[]> {
 }
 
 export async function getProperty(id: string): Promise<Property | null> {
+  if (useDemoData) return DEMO_PROPERTIES.find(p => p.id === id) ?? null;
   try {
     const ref = doc(db, 'properties', id);
     const snap = await getDoc(ref);

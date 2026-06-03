@@ -75,10 +75,11 @@ export function PropertyMap({ properties }: PropertyMapProps) {
     if (!mapInstanceRef.current) {
       mapInstanceRef.current = L.map(mapRef.current).setView(defaultCenter, 7);
 
-      // Add tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19
+      // Clean, modern basemap (CartoDB Voyager)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
       }).addTo(mapInstanceRef.current);
     }
 
@@ -90,67 +91,64 @@ export function PropertyMap({ properties }: PropertyMapProps) {
 
     if (validProperties.length === 0) return;
 
-    // Create custom icon
-    const propertyIcon = L.divIcon({
-      html: `<div class="flex items-center justify-center w-8 h-8 bg-blue-500 rounded-full border-2 border-white shadow-lg cursor-pointer hover:bg-blue-600 transition-colors">
-        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10.5 1.5H3.75A2.25 2.25 0 001.5 3.75v12.5A2.25 2.25 0 003.75 18.5h12.5a2.25 2.25 0 002.25-2.25V9.5M18.5 1.5v6h-6"/>
-        </svg>
-      </div>`,
-      className: 'property-marker',
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
-      popupAnchor: [0, -16]
-    });
+    // Compact price label, e.g. "€185K", "€2.5K", "€850"
+    const formatPriceShort = (price: string) => {
+      const n = parseFloat(String(price).replace(/[^\d.]/g, ''));
+      if (!isFinite(n) || n <= 0) return String(price);
+      if (n >= 1000) {
+        const k = n / 1000;
+        return '€' + (k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)) + 'K';
+      }
+      return '€' + Math.round(n);
+    };
 
     // Add markers for each property
     const bounds = L.latLngBounds([]);
 
     validProperties.forEach(property => {
+      // Price-tag pin (Airbnb/Zillow style)
+      const priceIcon = L.divIcon({
+        html: `<div class="pp-wrap">
+            <div class="pp-pill">${formatPriceShort(property.price)}</div>
+            <div class="pp-tip"></div>
+          </div>`,
+        className: 'price-pin',
+        iconSize: [64, 38],
+        iconAnchor: [32, 38],
+        popupAnchor: [0, -40]
+      });
+
       const marker = L.marker(
         [property.latitude!, property.longitude!],
-        { icon: propertyIcon }
+        { icon: priceIcon }
       ).addTo(map);
 
       // Create popup content
       const popupContent = `
-        <div class="p-0 w-64">
-          <div class="bg-white rounded-lg overflow-hidden">
-            ${
-              property.image
-                ? `<img src="${property.image}" alt="${property.title}" class="w-full h-40 object-cover" />`
-                : ''
-            }
-            <div class="p-4">
-              <h3 class="font-bold text-lg text-gray-800 mb-1">${property.title}</h3>
-              <p class="text-sm text-gray-600 mb-2">📍 ${property.location}</p>
-              <p class="text-blue-600 font-bold text-lg mb-3">${property.price}</p>
-
-              ${
-                property.beds || property.baths || property.area
-                  ? `<div class="flex gap-3 mb-3 text-sm text-gray-700">
-                      ${property.beds > 0 ? `<span>🛏️ ${property.beds} dhoma</span>` : ''}
-                      ${property.baths > 0 ? `<span>🚿 ${property.baths} tualet</span>` : ''}
-                      ${property.area > 0 ? `<span>📐 ${property.area} m²</span>` : ''}
-                    </div>`
-                  : ''
-              }
-
-              ${
-                property.type
-                  ? `<p class="text-xs bg-blue-100 text-blue-700 inline-block px-2 py-1 rounded mb-3">${property.type}</p>`
-                  : ''
-              }
-
-              <button id="btn-${property.id}" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition-colors">
-                Shiko detajet
+        <div class="w-64 bg-white">
+          <div class="relative">
+            ${property.image ? `<img src="${property.image}" alt="${property.title}" class="w-full h-36 object-cover" />` : ''}
+            <span class="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-[#d7622d]">${property.forRent ? 'Me Qira' : 'Në Shitje'}</span>
+          </div>
+          <div class="p-3.5">
+            <h3 class="font-bold text-[15px] text-gray-900 leading-snug mb-1">${property.title}</h3>
+            <p class="text-xs text-gray-500 mb-2.5">${property.location}</p>
+            <div class="flex items-center gap-3 text-xs text-gray-600 mb-3">
+              ${property.beds > 0 ? `<span>🛏 ${property.beds}</span>` : ''}
+              ${property.baths > 0 ? `<span>🛁 ${property.baths}</span>` : ''}
+              ${property.area > 0 ? `<span>📐 ${property.area} m²</span>` : ''}
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-lg text-[#d7622d]">${property.price.startsWith('€') ? property.price : '€' + property.price}</span>
+              <button id="btn-${property.id}" class="rounded-full bg-[#0f1614] hover:bg-[#1a8a8a] text-white text-xs font-semibold py-2 px-4 transition-colors">
+                Detajet
               </button>
             </div>
           </div>
         </div>
       `;
 
-      marker.bindPopup(popupContent, { maxWidth: 300 });
+      marker.bindPopup(popupContent, { maxWidth: 280, closeButton: true });
 
       // Add click handler for the button
       marker.on('popupopen', () => {

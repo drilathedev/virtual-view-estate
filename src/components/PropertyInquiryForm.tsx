@@ -102,12 +102,12 @@ export const PropertyInquiryForm = ({
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Emri <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-foreground/80 mb-1">
+              Emri <span className="text-destructive">*</span>
             </label>
             <Input
               placeholder="Emri juaj"
-              className="h-10 border-gray-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -116,13 +116,13 @@ export const PropertyInquiryForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-foreground/80 mb-1">
+              Email <span className="text-destructive">*</span>
             </label>
             <Input
               type="email"
               placeholder="email@example.com"
-              className="h-10 border-gray-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -131,13 +131,13 @@ export const PropertyInquiryForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground/80 mb-1">
               Telefon
             </label>
             <Input
               type="tel"
               placeholder="Numri i telefonit"
-              className="h-10 border-gray-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               disabled={isSubmitting}
@@ -145,12 +145,12 @@ export const PropertyInquiryForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground/80 mb-1">
               Tipi i Interesit
             </label>
             <Input
               placeholder="Shitje, Blerje, Qira, etj."
-              className="h-10 border-gray-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={interest}
               onChange={(e) => setInterest(e.target.value)}
               disabled={isSubmitting}
@@ -158,12 +158,12 @@ export const PropertyInquiryForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mesazhi <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-foreground/80 mb-1">
+              Mesazhi <span className="text-destructive">*</span>
             </label>
             <Textarea
               placeholder="Plotëso detajet e kërkesës tuaj..."
-              className="min-h-[100px] border-gray-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="min-h-[100px] rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               required
@@ -174,7 +174,7 @@ export const PropertyInquiryForm = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>

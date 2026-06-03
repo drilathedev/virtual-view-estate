@@ -1,97 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* ============================================================
+   EverGreen — Nature-inspired real estate design system.
+   Warm off-white surfaces, deep forest/olive green accents,
+   generous rounding, calm organic feel. All colors HSL.
+   ============================================================ */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    --background: 38 36% 97%;
+    --foreground: 24 19% 14%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card: 40 40% 99.5%;
+    --card-foreground: 24 19% 14%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover: 40 40% 99.5%;
+    --popover-foreground: 24 19% 14%;
 
-    --primary: 220 70% 18%;
+    /* Terracotta brand */
+    --primary: 17 65% 49%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 34 30% 92.5%;
+    --secondary-foreground: 24 24% 18%;
 
-    --muted: 210 15% 94%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 34 24% 93.5%;
+    --muted-foreground: 26 9% 43%;
 
-    --accent: 217 91% 60%;
+    /* Teal accent */
+    --accent: 184 64% 34%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 4 74% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 217 91% 60%;
+    --border: 33 22% 89%;
+    --input: 33 22% 89%;
+    --ring: 17 65% 49%;
 
-    --radius: 1rem;
+    --radius: 1.5rem;
 
-    /* Premium gradients */
-    --gradient-primary: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-    --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-    --gradient-hero: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 50%, rgba(51, 65, 85, 0.7) 100%);
-    --gradient-overlay: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.8) 100%);
-    --gradient-shine: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-    
-    /* Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    
-    /* Shadows */
-    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
-    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(0, 0, 0, 0.12);
-    --shadow-hard: 0 8px 32px rgba(0, 0, 0, 0.12), 0 16px 64px rgba(0, 0, 0, 0.16);
-    --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1);
-    
-    /* Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    --transition-elastic: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Brand palette helpers */
+    --amber: 38 92% 50%;       /* #f49f0a */
+    --gold: 50 94% 48%;        /* #efca08 */
+    --teal: 180 100% 33%;      /* #1a8a8a */
+    --sky: 204 64% 84%;        /* #bbdef0 */
+
+    /* Gradients */
+    --gradient-leaf: linear-gradient(135deg, #e2783f 0%, #c8501f 100%);
+    --gradient-hero: linear-gradient(180deg, rgba(40, 24, 14, 0.05) 0%, rgba(40, 24, 14, 0.55) 100%);
+
+    /* Soft warm shadows */
+    --shadow-soft: 0 1px 2px rgba(60, 40, 25, 0.04), 0 6px 20px rgba(60, 40, 25, 0.06);
+    --shadow-medium: 0 10px 30px rgba(60, 40, 25, 0.10), 0 2px 6px rgba(60, 40, 25, 0.04);
+    --shadow-hard: 0 24px 60px rgba(50, 32, 18, 0.16), 0 8px 18px rgba(50, 32, 18, 0.08);
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 20% 98%;
-
-    --card: 222 47% 13%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 222 47% 13%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-
-    --secondary: 217 32% 17%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 217 32% 17%;
-    --muted-foreground: 215 15% 65%;
-
-    --accent: 217 91% 60%;
-    --accent-foreground: 222 47% 11%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
-    --ring: 217 91% 60%;
-    
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --background: 24 18% 8%;
+    --foreground: 32 20% 96%;
+    --card: 24 16% 12%;
+    --card-foreground: 32 20% 96%;
+    --popover: 24 16% 12%;
+    --popover-foreground: 32 20% 96%;
+    --primary: 19 72% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 24 12% 17%;
+    --secondary-foreground: 32 20% 96%;
+    --muted: 24 12% 17%;
+    --muted-foreground: 30 10% 65%;
+    --accent: 180 70% 42%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 64% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 24 12% 20%;
+    --input: 24 12% 20%;
+    --ring: 19 72% 56%;
   }
 }
 
@@ -106,148 +94,148 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: 'ss01', 'cv01';
+    letter-spacing: -0.011em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
+    font-family: 'Geist', -apple-system, sans-serif;
+    @apply font-semibold;
+    letter-spacing: -0.033em;
+    line-height: 1.06;
   }
 
-  h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
-  }
+  h1 { @apply text-[2.5rem] leading-[1.04] md:text-5xl lg:text-[3.75rem]; font-weight: 600; }
+  h2 { @apply text-[1.85rem] leading-[1.08] md:text-[2.5rem]; font-weight: 600; }
+  h3 { @apply text-xl md:text-2xl; letter-spacing: -0.025em; }
 
-  h2 {
-    @apply text-3xl md:text-4xl lg:text-5xl;
-  }
-
-  h3 {
-    @apply text-2xl md:text-3xl;
-  }
+  p { letter-spacing: -0.006em; }
 }
 
 @layer utilities {
-  /* Glassmorphism effects */
-  .glass-card {
-    @apply bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl;
-    background: var(--glass-bg);
-    border-color: var(--glass-border);
-  }
-  
-  .glass-dark {
-    @apply bg-slate-900/30 backdrop-blur-xl border border-slate-700/50;
+  .font-display {
+    font-family: 'Geist', -apple-system, sans-serif;
+    letter-spacing: -0.033em;
   }
 
-  /* Hover effects */
-  .hover-lift {
-    @apply transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-2xl;
-  }
-  
-  .hover-glow {
-    @apply transition-all duration-300;
-  }
-  
-  .hover-glow:hover {
-    box-shadow: var(--shadow-glow);
-  }
-  
-  .hover-scale {
-    @apply transition-transform duration-500 ease-out hover:scale-105;
+  /* Refined editorial accent — Instrument Serif italic, used sparingly */
+  .font-accent {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0;
   }
 
-  /* Gradient text */
-  .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent;
-  }
-  
-  .gradient-text-primary {
-    @apply bg-gradient-to-r from-slate-900 via-slate-700 to-slate-600 bg-clip-text text-transparent;
-  }
-
-  /* Container */
   .container-custom {
-    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1240px] px-5 sm:px-6 lg:px-8;
   }
 
-  /* Animated gradients */
-  .gradient-animate {
-    background: linear-gradient(270deg, #3b82f6, #2563eb, #1d4ed8);
-    background-size: 400% 400%;
-    animation: gradient-x 3s ease infinite;
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium;
   }
-  
-  /* Shadow utilities */
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
+
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-medium { box-shadow: var(--shadow-medium); }
+  .shadow-hard { box-shadow: var(--shadow-hard); }
+
+  .hover-lift {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1;
   }
-  
-  .shadow-medium {
-    box-shadow: var(--shadow-medium);
-  }
-  
-  .shadow-hard {
-    box-shadow: var(--shadow-hard);
-  }
-  
-  /* Card with gradient border */
-  .card-gradient-border {
-    @apply relative overflow-hidden rounded-2xl;
-  }
-  
-  .card-gradient-border::before {
-    content: '';
-    @apply absolute inset-0 rounded-2xl p-[2px] -z-10;
-    background: linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
+  .hover-lift:hover { box-shadow: var(--shadow-hard); }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .bg-leaf { background: var(--gradient-leaf); }
 
   /* Animations */
-  .animate-fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.8s ease-out forwards;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.6s ease-out forwards;
-  }
-  
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
+  .animate-fade-in { animation: fadeIn 0.7s ease-out forwards; }
+  .animate-slide-up { animation: slideUp 0.7s ease-out forwards; }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
-
   @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
+
+/* ---------- Leaflet map theming (price pins + popups) ---------- */
+.leaflet-container {
+  font-family: 'Inter', sans-serif;
+  background: #eef1ed;
+}
+
+.price-pin .pp-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+.price-pin .pp-pill {
+  background: #d7622d;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 11px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  border: 2px solid #fff;
+  box-shadow: 0 5px 14px rgba(50, 30, 15, 0.3);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.price-pin .pp-tip {
+  width: 9px;
+  height: 9px;
+  margin-top: -5px;
+  background: #d7622d;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+  transition: background 0.15s ease;
+}
+.price-pin:hover { z-index: 1000 !important; }
+.price-pin:hover .pp-pill {
+  background: #1a8a8a;
+  transform: translateY(-2px) scale(1.06);
+}
+.price-pin:hover .pp-tip { background: #1a8a8a; }
+
+.leaflet-popup-content-wrapper {
+  border-radius: 20px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(40, 25, 15, 0.24);
+}
+.leaflet-popup-content {
+  margin: 0;
+  width: 256px !important;
+}
+.leaflet-popup-close-button {
+  top: 8px !important;
+  right: 8px !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #333 !important;
+  font-size: 18px !important;
+  line-height: 24px !important;
+  z-index: 10;
+}
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 6px 18px rgba(40, 25, 15, 0.14) !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+.leaflet-control-zoom a {
+  border: none !important;
+  color: #4a3a30 !important;
+}
+.leaflet-bar a:hover { background: #f4ece6 !important; }

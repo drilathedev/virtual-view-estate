@@ -1,105 +1,58 @@
-import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Home, Facebook, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
-import logo from '@/assets/prona360logo.png';
 
 export const Footer = () => {
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-16 overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-600/10 rounded-full blur-3xl" />
-      </div>
-      
-      <div className="container-custom relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          {/* Brand */}
-          <div>
-            <img src={logo} alt="PRONA360" className="h-10 w-auto object-contain mb-4" />
-            <p className="text-slate-300 mb-6 leading-relaxed">
-              Platforma më moderne e pasurive të paluajtshme me vizualizim 3D dhe tura virtuale.
-            </p>
-            <div className="flex gap-3">
-              <a href="https://www.facebook.com/share/1G9MhN9teb/?mibextid=wwXlfr" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition-all duration-300">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="https://instagram.com/prona360rks" className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:scale-110 transition-all duration-300">
-                <Instagram className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-bold text-lg mb-6 text-white">Lidhje të Shpejta</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link to="/" className="text-slate-300 hover:text-blue-400 hover:translate-x-1 transition-all duration-300 inline-block">
-                  → Ballina
-                </Link>
-              <li>
-                <Link to="/properties" className="text-slate-300 hover:text-blue-400 hover:translate-x-1 transition-all duration-300 inline-block">
-                  → Prona
-                </Link>
-              </li>
-              <li>
-                <Link to="/services" className="text-slate-300 hover:text-blue-400 hover:translate-x-1 transition-all duration-300 inline-block">
-                  → Vizualizimi 3D
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-slate-300 hover:text-blue-400 hover:translate-x-1 transition-all duration-300 inline-block">
-                  → Rreth Nesh
-                </Link>
-              </li>
-              </li>
-            </ul>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h3 className="font-bold text-lg mb-6 text-white">Shërbime</h3>
-            <ul className="space-y-3">
-              <li className="text-slate-300 hover:text-cyan-400 transition-colors cursor-default">✓ Tura Virtuale</li>
-              <li className="text-slate-300 hover:text-cyan-400 transition-colors cursor-default">✓ Fotografi Profesionale</li>
-              <li className="text-slate-300 hover:text-cyan-400 transition-colors cursor-default">✓ Vizualizim 3D</li>
-              <li className="text-slate-300 hover:text-cyan-400 transition-colors cursor-default">✓ Konsulencë</li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="font-bold text-lg mb-6 text-white">Kontakti</h3>
-            <ul className="space-y-4">
-              <li className="flex items-center gap-3 text-slate-300 hover:text-blue-400 transition-colors group">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                  <Phone className="h-4 w-4" />
-                </div>
-                <span>+383 49 295 636</span>
-              </li>
-              <li className="flex items-center gap-3 text-slate-300 hover:text-blue-400 transition-colors group">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                  <Mail className="h-4 w-4" />
-                </div>
-                <span className="break-all">prona360rks@gmail.com</span>
-              </li>
-              <li className="flex items-center gap-3 text-slate-300 hover:text-blue-400 transition-colors group">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                  <MapPin className="h-4 w-4" />
-                </div>
-                <span>Drenas, Kosovë</span>
-              </li>
-            </ul>
+    <footer className="border-t border-border bg-background pt-16">
+      <div className="container-custom">
+        {/* Editorial heading */}
+        <div className="flex flex-col gap-8 border-b border-border pb-12 lg:flex-row lg:items-end lg:justify-between">
+          <h2 className="max-w-2xl font-display text-3xl font-semibold leading-tight text-foreground lg:text-5xl">
+            Zbulo <span className="font-accent font-normal">mrekullitë</span> e natyrës
+            <br className="hidden lg:block" /> me udhëheqje eksperte
+          </h2>
+          <div className="text-sm text-muted-foreground lg:text-right">
+            <p>Drenas, Kosovë</p>
+            <p className="mt-1 font-medium text-foreground">+383 49 295 636</p>
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-10 mt-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-400 text-sm">© 2025 PRONA360. Të gjitha të drejtat e rezervuara.</p>
-            <div className="flex gap-6 text-sm">
-              <a href="#" className="text-slate-400 hover:text-blue-400 transition-colors">Politika e Privatësisë</a>
-              <a href="#" className="text-slate-400 hover:text-blue-400 transition-colors">Termat & Kushtet</a>
-            </div>
+        {/* Links row */}
+        <div className="flex flex-col gap-8 py-10 md:flex-row md:items-center md:justify-between">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-[0.7rem] bg-primary">
+              <Home className="h-[18px] w-[18px] text-primary-foreground" strokeWidth={2.4} />
+            </span>
+            <span className="font-display text-[1.35rem] font-semibold tracking-tight text-foreground">
+              Prona<span className="text-primary">360</span>
+            </span>
+          </Link>
+
+          <nav className="flex flex-wrap items-center gap-x-7 gap-y-3 text-sm font-medium text-muted-foreground">
+            <Link to="/" className="transition-colors hover:text-primary">Ballina</Link>
+            <Link to="/services" className="transition-colors hover:text-primary">Rreth Nesh</Link>
+            <Link to="/properties" className="transition-colors hover:text-primary">Prona</Link>
+            <Link to="/services" className="transition-colors hover:text-primary">Shërbime</Link>
+            <Link to="/properties-map" className="transition-colors hover:text-primary">Harta</Link>
+            <Link to="/contact" className="transition-colors hover:text-primary">Kontakt</Link>
+          </nav>
+
+          <div className="flex gap-3">
+            <a href="https://www.facebook.com/share/1G9MhN9teb/?mibextid=wwXlfr" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground/70 transition-colors hover:bg-primary hover:text-white">
+              <Facebook className="h-5 w-5" />
+            </a>
+            <a href="https://instagram.com/prona360rks" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-foreground/70 transition-colors hover:bg-primary hover:text-white">
+              <Instagram className="h-5 w-5" />
+            </a>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-border py-6 text-sm text-muted-foreground md:flex-row">
+          <p>© 2025 PRONA360. Të gjitha të drejtat e rezervuara.</p>
+          <div className="flex gap-6">
+            <a href="#" className="transition-colors hover:text-primary">Termat &amp; Kushtet</a>
+            <a href="#" className="transition-colors hover:text-primary">Privatësia</a>
           </div>
         </div>
       </div>

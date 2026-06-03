@@ -21,7 +21,7 @@ const NotFound = () => {
           <CardContent className="pt-12 pb-12 text-center space-y-8">
             {/* 404 Illustration */}
             <div className="relative">
-              <div className="text-9xl font-bold gradient-text">404</div>
+              <div className="text-9xl font-bold text-primary">404</div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-accent/10 flex items-center justify-center animate-pulse">
                 <AlertCircle className="h-16 w-16 text-accent" />
               </div>

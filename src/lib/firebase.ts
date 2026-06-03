@@ -12,8 +12,21 @@ interface FirebaseServices {
 
 let services: FirebaseServices | null = null;
 
+// Whether real Firebase credentials are present. When false the app runs in a
+// degraded "preview" mode: the data layer serves local demo content instead of
+// hitting Firestore, and the public site renders without crashing. Set real
+// VITE_FIREBASE_* vars in .env to enable live data, auth and admin features.
+export const isFirebaseConfigured = Boolean(
+  import.meta.env.VITE_FIREBASE_API_KEY &&
+  import.meta.env.VITE_FIREBASE_AUTH_DOMAIN &&
+  import.meta.env.VITE_FIREBASE_PROJECT_ID &&
+  import.meta.env.VITE_FIREBASE_STORAGE_BUCKET &&
+  import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID &&
+  import.meta.env.VITE_FIREBASE_APP_ID
+);
+
 // Export the configured storage bucket (accepts plain name or full gs:// URL)
-export const STORAGE_BUCKET_RAW = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string;
+export const STORAGE_BUCKET_RAW = (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) || 'demo-prona360.appspot.com';
 export const STORAGE_BUCKET_URL = STORAGE_BUCKET_RAW && STORAGE_BUCKET_RAW.startsWith('gs://')
   ? STORAGE_BUCKET_RAW
   : `gs://${STORAGE_BUCKET_RAW}`;
@@ -21,33 +34,25 @@ export const STORAGE_BUCKET_URL = STORAGE_BUCKET_RAW && STORAGE_BUCKET_RAW.start
 export function getFirebase(): FirebaseServices {
   if (services) return services;
 
+  // Fall back to a harmless placeholder config when env vars are missing so
+  // module evaluation never throws and white-screens the whole app. Live
+  // network calls won't succeed, but the demo data layer covers the public UI.
   const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID as string,
+    apiKey: (import.meta.env.VITE_FIREBASE_API_KEY as string) || 'AIzaSyDEMO-preview-key-not-for-production',
+    authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string) || 'demo-prona360.firebaseapp.com',
+    projectId: (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) || 'demo-prona360',
+    storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) || 'demo-prona360.appspot.com',
+    messagingSenderId: (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || '000000000000',
+    appId: (import.meta.env.VITE_FIREBASE_APP_ID as string) || '1:000000000000:web:0000000000000000000000',
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string | undefined
   };
 
-  const required: (keyof typeof firebaseConfig)[] = [
-    'apiKey',
-    'authDomain',
-    'projectId',
-    'storageBucket',
-    'messagingSenderId',
-    'appId'
-  ];
-  const missing = required.filter(k => !firebaseConfig[k]);
-  if (missing.length) {
-    const msg = `Missing Firebase env vars: ${missing.join(', ')}.\n` +
-      'Ensure .env has VITE_FIREBASE_* variables and restart dev server.';
-    console.error(msg, firebaseConfig);
-    throw new Error(msg);
-  }
-
-  if (firebaseConfig.apiKey && firebaseConfig.apiKey.startsWith('AIzaSy') === false) {
+  if (!isFirebaseConfigured) {
+    console.warn(
+      '[firebase] Running in preview mode without Firebase credentials — ' +
+      'serving local demo data. Add VITE_FIREBASE_* vars to .env for live data.'
+    );
+  } else if (firebaseConfig.apiKey && firebaseConfig.apiKey.startsWith('AIzaSy') === false) {
     console.warn('[firebase] apiKey looks unusual – double check value.');
   }
 

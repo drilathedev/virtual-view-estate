@@ -1,6 +1,6 @@
 import { PropertyCard } from "./PropertyCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, SearchX } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
 import { listProperties, Property } from '@/lib/properties';
@@ -11,7 +11,6 @@ export const PropertyGrid = () => {
     queryFn: listProperties
   });
 
-  // Get query params from URL
   const params = new URLSearchParams(window.location.search);
   const q = params.get('q')?.toLowerCase() || '';
   const location = params.get('location')?.toLowerCase() || '';
@@ -23,19 +22,15 @@ export const PropertyGrid = () => {
   const feature = params.get('feature')?.toLowerCase() || '';
   const forRent = params.get('forRent')?.toLowerCase() || '';
 
-  // Filter properties
   const filtered = properties.filter((p) => {
     let match = true;
     if (q && !p.title.toLowerCase().includes(q) && !p.location.toLowerCase().includes(q)) match = false;
     if (location && !p.location.toLowerCase().includes(location)) match = false;
-    // `type` query param is used for property category (apartment/shtepi/vile/penthouse)
     if (type) {
       const propType = (p as any).type?.toLowerCase();
-      // If property has explicit `type` field, match it
       if (propType) {
         if (propType !== type) match = false;
       } else {
-        // Fallback: try matching title, description or features for the keyword
         const inTitle = p.title?.toLowerCase().includes(type);
         const inDesc = (p as any).description?.toLowerCase().includes(type);
         const inFeatures = p.features?.some(f => f.toLowerCase().includes(type));
@@ -46,74 +41,53 @@ export const PropertyGrid = () => {
     if (priceMax && parseFloat(p.price.replace(/[^\d.]/g, '')) > priceMax) match = false;
     if (forRent === 'rent' && !p.forRent) match = false;
     if (forRent === 'sale' && p.forRent) match = false;
-    // Area filter: handle 'Toka' (land) in ha, others in m²
-    if (areaMin !== undefined) {
-      if (p.mediaType === 'land') {
-        if (p.area < areaMin) match = false;
-      } else {
-        if (p.area < areaMin) match = false;
-      }
-    }
-    if (areaMax !== undefined) {
-      if (p.mediaType === 'land') {
-        if (p.area > areaMax) match = false;
-      } else {
-        if (p.area > areaMax) match = false;
-      }
-    }
-    // If features are stored as array, add feature filter here
+    if (areaMin !== undefined && p.area < areaMin) match = false;
+    if (areaMax !== undefined && p.area > areaMax) match = false;
     if (feature && !(p.features?.some(f => f.toLowerCase().includes(feature)))) match = false;
     return match;
   });
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="container-custom space-y-12">
+    <section className="py-16 lg:py-24">
+      <div className="container-custom space-y-10">
         {/* Header */}
-        <div className="text-center space-y-3">
-          <h2 className="text-gray-900">Prona të veçantuara</h2>
-          <p className="text-gray-600 text-base max-w-2xl mx-auto">
-            Eksploro koleksionin tonë të kuratuar të pronave premium me vizualizim të avancuar
-          </p>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-xl space-y-3">
+            <h2 className="text-foreground">Eksploro shtëpitë tona <span className="font-accent font-normal">premium</span></h2>
+            <p className="text-sm text-muted-foreground">
+              Çdo listim ofron tipare unike, cilësi të jashtëzakonshme dhe lokacione kryesore —
+              duke siguruar një përvojë jetese ekskluzive.
+            </p>
+          </div>
+          <Link to="/properties" className="shrink-0">
+            <Button variant="outline" className="rounded-full border-2 border-foreground/15 h-11 font-medium hover:bg-secondary">
+              Shiko të gjitha pronat
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </div>
 
-        {/* Properties Grid */}
+        {/* Grid */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              <div className="text-gray-600">Po ngarkohen pronat…</div>
-            </div>
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : isError ? (
-          <div className="py-12 text-center text-red-600">
-            Failed to load properties. Please try again later.
-          </div>
+          <div className="py-16 text-center text-destructive">Ngarkimi i pronave dështoi.</div>
         ) : filtered.length === 0 ? (
-          <div className="py-12 text-center text-gray-600">
-            No properties found for your search.
+          <div className="flex flex-col items-center gap-3 py-20 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary">
+              <SearchX className="h-7 w-7 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground">Nuk u gjetën prona për kërkimin tuaj.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((property) => (
               <PropertyCard key={property.id} {...property} />
             ))}
           </div>
         )}
-
-        {/* View All Button */}
-        <div className="text-center pt-4">
-          <Link to="/properties">
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-2 border-gray-300 hover:border-blue-600 hover:text-blue-600 font-medium"
-            >
-              Shiko të gjitha pronat
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
       </div>
     </section>
   );
