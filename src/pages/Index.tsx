@@ -1,7 +1,6 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { AboutCollage } from "@/components/AboutCollage";
-import { BestValue } from "@/components/BestValue";
 import { PropertyGrid } from "@/components/PropertyGrid";
 import { FAQ } from "@/components/FAQ";
 import Testimonials from "@/components/Testimonials";
@@ -23,7 +22,6 @@ const Index = () => {
         <Header />
         <Hero />
         <AboutCollage />
-        <BestValue />
         <PropertyGrid />
         <FAQ />
         <Testimonials />

@@ -4,7 +4,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { sendToTelegram } from '@/lib/telegram';
@@ -124,6 +124,15 @@ const Contact = () => {
                   <p className="text-muted-foreground">
                     Drenas, Kosovo
                   </p>
+                </div>
+
+                <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-soft transition-shadow hover:shadow-medium">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+                    <Clock className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="mb-2 font-semibold text-foreground">Working Hours</h3>
+                  <p className="text-sm text-muted-foreground">Monday – Saturday</p>
+                  <p className="font-semibold text-foreground">09:00 – 18:00</p>
                 </div>
               </div>
 

@@ -5,9 +5,9 @@ export const BestValue = () => {
   return (
     <section className="py-12 lg:py-16">
       <div className="container-custom">
-        <div className="grid grid-cols-1 items-center gap-8 rounded-[2rem] bg-secondary/60 p-6 lg:grid-cols-2 lg:p-10">
+        <div className="grid grid-cols-1 items-center gap-8 rounded-[2rem] border border-border/70 bg-secondary/50 p-6 shadow-soft lg:grid-cols-2 lg:p-10">
           {/* Map */}
-          <div className="relative overflow-hidden rounded-[1.5rem] shadow-soft">
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-border/80 shadow-soft">
             <iframe
               title="Interactive Kosovo Property Map"
               className="h-64 w-full lg:h-80"
@@ -16,11 +16,14 @@ export const BestValue = () => {
               src="https://www.openstreetmap.org/export/embed.html?bbox=20.0%2C42.0%2C21.8%2C43.0&layer=mapnik"
             />
             <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-full">
-              <div className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white shadow-hard">
+              <div className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white shadow-hard animate-pulse">
                 <Home className="h-3.5 w-3.5" />
-                Dream Home
+                Featured Estates
               </div>
               <div className="mx-auto h-3 w-3 -translate-y-1 rotate-45 bg-primary" />
+            </div>
+            <div className="absolute top-3 left-3 rounded-full bg-card/90 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-foreground/80 shadow-sm">
+              Live Kosovo Coverage
             </div>
           </div>
 

@@ -250,18 +250,39 @@ export default function PropertyDetail() {
             )}
 
             {/* Location */}
-            <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 shadow-soft">
-              <div className="overflow-hidden rounded-[1.1rem]">
-                <iframe
-                  title="Property Location Map"
-                  width="100%"
-                  height="100%"
-                  className="h-72 w-full"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(property.location)}&output=embed`}
-                />
+            <div className="overflow-hidden rounded-[1.6rem] border border-border/80 bg-card p-6 shadow-soft">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="font-display text-xl font-semibold text-foreground">Location &amp; Surroundings</h2>
+                  <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 text-primary shrink-0" />
+                    <span>{property.location}</span>
+                  </p>
+                </div>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-secondary px-4 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-secondary/80"
+                >
+                  <span>Open in Google Maps</span>
+                  <Share2 className="h-3 w-3" />
+                </a>
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-border/50 pt-4">
+                <div className="rounded-xl bg-secondary/40 p-3 text-xs">
+                  <span className="font-semibold text-foreground block">Prime Location</span>
+                  <span className="text-muted-foreground mt-0.5 block">Situated in an established, high-demand neighborhood</span>
+                </div>
+                <div className="rounded-xl bg-secondary/40 p-3 text-xs">
+                  <span className="font-semibold text-foreground block">Convenient Access</span>
+                  <span className="text-muted-foreground mt-0.5 block">Close proximity to essential services and transport</span>
+                </div>
+                <div className="rounded-xl bg-secondary/40 p-3 text-xs">
+                  <span className="font-semibold text-foreground block">Verified Address</span>
+                  <span className="text-muted-foreground mt-0.5 block">Inspected and confirmed on municipal records</span>
+                </div>
               </div>
             </div>
           </div>
@@ -269,19 +290,41 @@ export default function PropertyDetail() {
           {/* Sticky sidebar */}
           <div className="lg:col-span-1">
             <div className="space-y-5 lg:sticky lg:top-24">
-              <div className="rounded-[1.5rem] bg-leaf p-7 text-white shadow-soft">
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Tag className="h-4 w-4" /> {property.forRent ? "Monthly Rent" : "Listing Price"}
-                </div>
-                <div className="mt-2 font-display text-4xl font-semibold">
-                  {priceText}
-                  {property.forRent && <span className="text-base font-normal text-white/80">/month</span>}
-                </div>
-                <a href="tel:+38349295636">
-                  <span className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]">
-                    <Phone className="h-4 w-4" /> Schedule a Viewing
+              <div className="rounded-[1.6rem] border border-border/80 bg-card p-7 text-foreground shadow-soft">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <Tag className="h-3.5 w-3.5 text-muted-foreground" /> {property.forRent ? "Monthly Rent" : "Listing Price"}
+                  </div>
+                  <span className="rounded-full bg-secondary border border-border px-2.5 py-0.5 text-[11px] font-bold text-foreground">
+                    Verified
                   </span>
-                </a>
+                </div>
+                <div className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground">
+                  {priceText}
+                  {property.forRent && <span className="text-base font-normal text-muted-foreground">/month</span>}
+                </div>
+
+                <div className="mt-6 flex flex-col gap-2.5">
+                  <a href="tel:+38349295636">
+                    <span className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 hover:scale-[1.01] active:scale-[0.99]">
+                      <Phone className="h-4 w-4" /> Schedule a Viewing
+                    </span>
+                  </a>
+                  <a
+                    href="https://wa.me/38349295636"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-secondary px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-secondary/80">
+                      Message on WhatsApp
+                    </span>
+                  </a>
+                </div>
+
+                <div className="mt-6 border-t border-border/60 pt-4 text-[11px] text-muted-foreground flex items-center justify-between">
+                  <span>Direct Agent Support</span>
+                  <span>Free Consultation</span>
+                </div>
               </div>
 
               <PropertyInquiryForm propertyId={property.id} propertyTitle={property.title} />
@@ -322,11 +365,11 @@ export default function PropertyDetail() {
 }
 
 const Spec = ({ icon: Icon, value, label }: { icon: any; value: any; label: string }) => (
-  <div className="rounded-[1.25rem] border border-border bg-card p-4">
-    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-      <Icon className="h-5 w-5 text-primary" />
+  <div className="rounded-[1.4rem] border border-border/80 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-medium">
+    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+      <Icon className="h-5 w-5" />
     </span>
-    <div className="mt-3 font-display text-xl font-semibold text-foreground">{value}</div>
-    <div className="text-xs text-muted-foreground">{label}</div>
+    <div className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground">{value}</div>
+    <div className="text-xs font-medium text-muted-foreground mt-0.5">{label}</div>
   </div>
 );

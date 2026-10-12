@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { to: '/', label: 'Home' },
   { to: '/properties', label: 'Properties' },
-  { to: '/properties-map', label: 'Map' },
   { to: '/services', label: 'Services' },
   { to: '/contact', label: 'Contact' },
 ];
@@ -45,7 +44,7 @@ export const Header = ({ overlay = false }: HeaderProps) => {
 
   const wrap = overlay
     ? 'absolute top-0 left-0 right-0 z-50'
-    : 'sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl';
+    : 'sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]';
 
   return (
     <header className={wrap}>
@@ -64,7 +63,7 @@ export const Header = ({ overlay = false }: HeaderProps) => {
                   className={`relative py-1 text-[0.95rem] font-medium transition-colors ${
                     overlay
                       ? active ? 'text-white' : 'text-white/70 hover:text-white'
-                      : active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                      : active ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {item.label}
@@ -79,7 +78,7 @@ export const Header = ({ overlay = false }: HeaderProps) => {
           {/* Right actions */}
           <div className="flex items-center gap-2">
             <Link to="/contact" className="hidden sm:block">
-              <Button className="h-10 rounded-full bg-primary px-5 text-[0.9rem] font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 hover:shadow-medium">
+              <Button className="h-10 rounded-full bg-primary px-5 text-[0.9rem] font-semibold text-primary-foreground shadow-soft transition-all duration-200 hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98]">
                 List Property
               </Button>
             </Link>

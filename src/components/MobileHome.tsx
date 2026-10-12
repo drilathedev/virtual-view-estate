@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { listProperties, Property } from "@/lib/properties";
-import { Bell, Search, SlidersHorizontal, Bed, Bath, Star, Square, MapPin, Loader2, ArrowUpRight } from "lucide-react";
+import { Search, Bed, Bath, Star, Square, MapPin, Loader2, ArrowUpRight } from "lucide-react";
 
 const categories = ["All", "Villas", "Apartments", "For Sale", "For Rent"];
 
@@ -34,22 +34,22 @@ export const MobileHome = () => {
       {/* Greeting */}
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-[#c8501f] text-base font-bold text-white shadow-soft">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-base font-bold text-background shadow-soft">
             P
           </span>
           <div>
-            <p className="text-xs text-muted-foreground">Hello 👋</p>
-            <p className="text-base font-bold text-foreground">Welcome to PRONA360</p>
+            <p className="text-xs text-muted-foreground">Premium Living</p>
+            <p className="text-base font-bold text-foreground">PRONA360</p>
           </div>
         </div>
-        <Link to="/contact" className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-soft" aria-label="Notifications">
-          <Bell className="h-5 w-5 text-foreground/70" />
+        <Link to="/contact" className="rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground shadow-sm">
+          Contact Us
         </Link>
       </header>
 
       {/* Search */}
       <div className="mt-5 flex items-center gap-2.5">
-        <div className="flex flex-1 items-center gap-2.5 rounded-2xl bg-card px-4 py-3.5 shadow-soft">
+        <div className="flex flex-1 items-center gap-2.5 rounded-2xl bg-card px-4 py-3.5 shadow-soft border border-border/60">
           <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
           <input
             value={q}
@@ -59,8 +59,8 @@ export const MobileHome = () => {
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
-        <button onClick={submit} className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-[#1a8a8a] text-white shadow-soft transition-transform active:scale-95" aria-label="Filters">
-          <SlidersHorizontal className="h-5 w-5" />
+        <button onClick={submit} className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-foreground text-background shadow-soft transition-transform active:scale-95" aria-label="Search">
+          <Search className="h-5 w-5" />
         </button>
       </div>
 
@@ -71,7 +71,7 @@ export const MobileHome = () => {
             key={c}
             onClick={() => setActive(c)}
             className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${
-              active === c ? "bg-primary text-primary-foreground shadow-soft" : "bg-card text-foreground/60 shadow-soft"
+              active === c ? "bg-primary text-primary-foreground shadow-soft" : "bg-card text-foreground/70 shadow-soft"
             }`}
           >
             {c}
@@ -94,15 +94,20 @@ export const MobileHome = () => {
         <>
           {/* Featured */}
           {featured && (
-            <Link to={`/property/${featured.id}`} className="mt-6 block rounded-[1.75rem] bg-card p-3 shadow-medium transition-transform active:scale-[0.99]">
+            <Link to={`/property/${featured.id}`} className="mt-6 block rounded-[1.75rem] border border-border/70 bg-card p-3 shadow-medium transition-transform active:scale-[0.99]">
               <div className="relative overflow-hidden rounded-[1.4rem]">
                 <img src={featured.image} alt={featured.title} className="h-56 w-full object-cover" />
-                <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary backdrop-blur">
+                <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
-                <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
+                <span className="absolute left-3 top-3 rounded-full bg-background/95 border border-border/60 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur shadow-sm">
                   {featured.forRent ? "For Rent" : "For Sale"}
                 </span>
+                {featured.mediaType === "3d" && (
+                  <span className="absolute bottom-3 left-3 rounded-full bg-foreground text-background px-2.5 py-0.5 text-[10px] font-bold backdrop-blur">
+                    360° Tour
+                  </span>
+                )}
               </div>
               <div className="px-1.5 pb-1 pt-3.5">
                 <div className="flex items-start justify-between gap-3">
@@ -115,7 +120,7 @@ export const MobileHome = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-xs text-muted-foreground">{featured.forRent ? "/mo" : "Price"}</div>
-                    <div className="text-lg font-extrabold text-foreground">
+                    <div className="text-lg font-bold text-foreground">
                       {featured.price.startsWith("€") ? featured.price : `€${featured.price}`}
                     </div>
                   </div>
@@ -139,17 +144,22 @@ export const MobileHome = () => {
 
               <div className="no-scrollbar -mx-5 mt-3 flex gap-4 overflow-x-auto px-5 pb-2">
                 {rest.map((p) => (
-                  <Link key={p.id} to={`/property/${p.id}`} className="w-64 shrink-0 rounded-[1.4rem] bg-card p-2.5 shadow-soft transition-transform active:scale-[0.98]">
+                  <Link key={p.id} to={`/property/${p.id}`} className="w-64 shrink-0 rounded-[1.4rem] border border-border/70 bg-card p-2.5 shadow-soft transition-transform active:scale-[0.98]">
                     <div className="relative overflow-hidden rounded-[1.1rem]">
                       <img src={p.image} alt={p.title} className="h-32 w-full object-cover" />
-                      <span className="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-semibold text-primary backdrop-blur">
+                      <span className="absolute left-2.5 top-2.5 rounded-full bg-background/95 border border-border/60 px-2.5 py-0.5 text-[11px] font-semibold text-foreground backdrop-blur">
                         {p.forRent ? "For Rent" : "For Sale"}
                       </span>
+                      {p.mediaType === "3d" && (
+                        <span className="absolute bottom-2 left-2 rounded-full bg-foreground text-background px-2 py-0.5 text-[9px] font-bold backdrop-blur">
+                          360°
+                        </span>
+                      )}
                     </div>
                     <div className="px-1 pt-2.5">
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="line-clamp-1 text-sm font-bold text-foreground">{p.title}</h3>
-                        <span className="shrink-0 text-sm font-extrabold text-primary">
+                        <span className="shrink-0 text-sm font-bold text-foreground">
                           {p.price.startsWith("€") ? p.price : `€${p.price}`}
                         </span>
                       </div>
@@ -172,7 +182,7 @@ export const MobileHome = () => {
 const toneMap = {
   terracotta: { bg: "bg-primary/10", icon: "text-primary" },
   amber: { bg: "bg-amber-100", icon: "fill-amber-400 text-amber-400" },
-  teal: { bg: "bg-[#1a8a8a]/12", icon: "text-[#1a8a8a]" },
+  teal: { bg: "bg-accent/15", icon: "text-accent" },
 } as const;
 
 const Stat = ({ icon: Icon, text, tone = "terracotta" }: { icon: any; text: string; tone?: keyof typeof toneMap }) => (

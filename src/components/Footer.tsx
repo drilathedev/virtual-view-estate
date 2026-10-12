@@ -31,7 +31,6 @@ export const Footer = () => {
           <nav className="flex flex-wrap items-center gap-x-7 gap-y-3 text-sm font-medium text-muted-foreground">
             <Link to="/" className="transition-colors hover:text-primary">Home</Link>
             <Link to="/properties" className="transition-colors hover:text-primary">Properties</Link>
-            <Link to="/properties-map" className="transition-colors hover:text-primary">Map</Link>
             <Link to="/services" className="transition-colors hover:text-primary">Services</Link>
             <Link to="/contact" className="transition-colors hover:text-primary">Contact</Link>
           </nav>

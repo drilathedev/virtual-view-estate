@@ -905,7 +905,7 @@ export default function Admin() {
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="font-bold text-accent">{p.price}</div>
+                          <div className="font-bold text-foreground">{p.price}</div>
                           {p.forRent && <div className="text-xs text-muted-foreground">per month</div>}
                         </td>
                         <td className="py-4 px-4">

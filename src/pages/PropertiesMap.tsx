@@ -52,18 +52,33 @@ export default function PropertiesMap() {
       <div className="relative flex-1 overflow-hidden lg:grid lg:grid-cols-[400px_1fr]">
         {/* ---------- Desktop results panel ---------- */}
         <aside className="hidden flex-col overflow-hidden border-r border-border bg-background lg:flex">
-          <div className="border-b border-border px-6 py-5">
-            <h1 className="font-display text-2xl font-semibold text-foreground">
-              {loading ? 'Loading…' : `${filteredProperties.length} properties in Kosovo`}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">Pan the map or click a price marker for details.</p>
-            <div className="no-scrollbar -mx-1 mt-4 flex gap-2 overflow-x-auto px-1">
+          <div className="border-b border-border px-6 py-5 space-y-3.5">
+            <div>
+              <h1 className="font-display text-2xl font-semibold text-foreground">
+                {loading ? 'Loading…' : `${filteredProperties.length} properties in Kosovo`}
+              </h1>
+              <p className="mt-1 text-xs text-muted-foreground">Pan the map or click a price marker for details.</p>
+            </div>
+
+            {/* Desktop Search Input */}
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Filter by city, area, or property name..."
+                className="h-10 w-full rounded-2xl border border-border/80 bg-secondary/50 pl-10 pr-4 text-xs font-medium outline-none transition-all focus:border-primary focus:bg-background"
+              />
+            </div>
+
+            {/* Category Chips */}
+            <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pt-1">
               {chips.map((c) => (
                 <button
                   key={c}
                   onClick={() => setActive(c)}
-                  className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                    active === c ? 'bg-primary text-primary-foreground shadow-soft' : 'bg-secondary text-foreground/60 hover:bg-secondary/80'
+                  className={`shrink-0 rounded-full px-3.5 py-1 text-xs font-semibold transition-all ${
+                    active === c ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-secondary text-foreground/60 hover:bg-secondary/80'
                   }`}
                 >
                   {c}
@@ -76,30 +91,41 @@ export default function PropertiesMap() {
             {loading ? (
               <div className="flex justify-center py-20"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>
             ) : filteredProperties.length === 0 ? (
-              <div className="py-20 text-center">
+              <div className="py-20 text-center space-y-2">
                 <p className="text-sm text-muted-foreground">No properties match your filter.</p>
-                <button onClick={() => { setActive('All'); setSearch(''); }} className="mt-3 text-sm font-semibold text-primary underline">
+                <button onClick={() => { setActive('All'); setSearch(''); }} className="text-xs font-semibold text-primary underline">
                   Reset filters
                 </button>
               </div>
             ) : (
               filteredProperties.map((p) => (
-                <Link key={p.id} to={`/property/${p.id}`} className="group flex gap-3 rounded-[1.25rem] bg-card p-2.5 shadow-soft transition-shadow hover:shadow-medium">
-                  <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-[1rem]">
+                <Link key={p.id} to={`/property/${p.id}`} className="group flex gap-3 rounded-[1.25rem] border border-border/60 bg-card p-2.5 shadow-soft transition-all duration-300 hover:border-primary/30 hover:shadow-medium">
+                  <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-[1rem] bg-muted/60">
                     <img src={p.image} alt={p.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     <span className="absolute left-1.5 top-1.5 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-bold text-primary backdrop-blur">
                       {p.forRent ? 'Rent' : 'Sale'}
                     </span>
+                    {p.mediaType === '3d' && (
+                      <span className="absolute bottom-1.5 left-1.5 rounded-full bg-accent/90 px-1.5 py-0.5 text-[9px] font-bold text-white backdrop-blur">
+                        360°
+                      </span>
+                    )}
                   </div>
-                  <div className="flex flex-1 flex-col py-1">
-                    <h3 className="line-clamp-1 text-sm font-bold text-foreground group-hover:text-primary">{p.title}</h3>
-                    <div className="mt-1 flex items-center text-xs text-muted-foreground">
-                      <MapPin className="mr-1 h-3 w-3 text-primary" />
-                      <span className="line-clamp-1">{p.location}</span>
+                  <div className="flex flex-1 flex-col py-1 justify-between">
+                    <div>
+                      <h3 className="line-clamp-1 text-sm font-bold text-foreground group-hover:text-primary transition-colors">{p.title}</h3>
+                      <div className="mt-1 flex items-center text-xs text-muted-foreground">
+                        <MapPin className="mr-1 h-3 w-3 text-primary shrink-0" />
+                        <span className="line-clamp-1">{p.location}</span>
+                      </div>
                     </div>
-                    <div className="mt-auto flex items-center gap-3 pt-2 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5 text-[#1a8a8a]" />{p.beds}</span>
-                      <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5 text-[#1a8a8a]" />{p.baths}</span>
+                    <div className="flex items-center gap-3 pt-2 text-xs text-muted-foreground border-t border-border/40">
+                      {p.mediaType !== 'land' && (
+                        <>
+                          <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5 text-primary" />{p.beds}</span>
+                          <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5 text-primary" />{p.baths}</span>
+                        </>
+                      )}
                       <span className="ml-auto text-sm font-extrabold text-foreground">
                         {p.price.startsWith('€') ? p.price : `€${p.price}`}
                       </span>

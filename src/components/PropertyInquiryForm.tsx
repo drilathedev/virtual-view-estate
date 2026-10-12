@@ -95,19 +95,20 @@ export const PropertyInquiryForm = ({
   };
 
   return (
-    <Card className="shadow-medium hover:shadow-hard transition-shadow">
-      <CardHeader className="border-b">
-        <CardTitle className="text-lg">Property Inquiry</CardTitle>
+    <Card className="rounded-[1.6rem] border border-border/80 shadow-soft hover:shadow-medium transition-shadow overflow-hidden">
+      <CardHeader className="border-b border-border/70 bg-secondary/30 px-6 py-4">
+        <CardTitle className="text-base font-semibold">Direct Property Inquiry</CardTitle>
+        <p className="text-xs text-muted-foreground mt-0.5">Send a private inquiry directly to our listing agent</p>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground/80 mb-1">
+            <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
               Full Name <span className="text-destructive">*</span>
             </label>
             <Input
               placeholder="Your full name"
-              className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
+              className="h-11 rounded-xl bg-secondary/40 border-border/70 focus:bg-background focus-visible:ring-primary text-sm"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required

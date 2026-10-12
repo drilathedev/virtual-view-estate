@@ -4,17 +4,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import heroImage from "@/assets/hero-bg.jpg";
 import floatImage from "@/assets/property-2.jpg";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Hero = () => {
   const navigate = useNavigate();
   const [type, setType] = useState("");
   const [location, setLocation] = useState("");
+  const [status, setStatus] = useState<"all" | "sale" | "rent">("all");
 
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (location) params.set("location", location);
     if (type) params.set("type", type);
+    if (status !== "all") params.set("forRent", status);
     navigate(`/properties?${params.toString()}`);
   };
 
@@ -24,10 +26,10 @@ export const Hero = () => {
       <div className="pointer-events-none absolute -left-32 top-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
 
-      <div className="container-custom relative grid grid-cols-1 items-center gap-10 py-12 lg:grid-cols-2 lg:gap-12 lg:py-20">
+      <div className="container-custom relative grid grid-cols-1 items-center gap-10 py-12 lg:grid-cols-2 lg:gap-14 lg:py-20">
         {/* Left — copy + search */}
         <div className="order-2 lg:order-1">
-          <span className="chip bg-primary/10 text-primary">
+          <span className="chip bg-primary/10 text-primary border border-primary/20 shadow-sm">
             <Sparkles className="h-3.5 w-3.5" />
             #1 3D Virtual Tour Platform
           </span>
@@ -41,40 +43,80 @@ export const Hero = () => {
             all in one seamless experience.
           </p>
 
-          {/* Search bar */}
-          <div className="mt-8 rounded-2xl bg-card p-2 shadow-medium sm:flex sm:items-center sm:gap-2">
-            <div className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2">
-              <MapPin className="h-5 w-5 shrink-0 text-primary" />
-              <input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Where are you searching? Pristina, Prizren..."
-                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-              />
+          {/* Search container */}
+          <div className="mt-8 space-y-2.5">
+            {/* Quick Segmented Toggle */}
+            <div className="inline-flex items-center rounded-full bg-secondary/80 p-1 border border-border/60">
+              <button
+                type="button"
+                onClick={() => setStatus("all")}
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                  status === "all"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                All Listings
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus("sale")}
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                  status === "sale"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                For Sale
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus("rent")}
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                  status === "rent"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                For Rent
+              </button>
             </div>
-            <div className="hidden h-8 w-px bg-border sm:block" />
-            <div className="px-1 py-2 sm:py-0">
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger className="h-10 w-full rounded-xl border-0 bg-transparent text-sm font-medium shadow-none focus:ring-0 sm:w-36">
-                  <SelectValue placeholder="Property Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="apartment">Apartment</SelectItem>
-                  <SelectItem value="house">House</SelectItem>
-                  <SelectItem value="villa">Villa</SelectItem>
-                  <SelectItem value="penthouse">Penthouse</SelectItem>
-                  <SelectItem value="land">Land</SelectItem>
-                </SelectContent>
-              </Select>
+
+            {/* Search bar */}
+            <div className="rounded-2xl border border-border/80 bg-card p-2 shadow-medium transition-all hover:shadow-hard sm:flex sm:items-center sm:gap-2">
+              <div className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2">
+                <MapPin className="h-5 w-5 shrink-0 text-primary" />
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  placeholder="Where are you searching? Pristina, Peja..."
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              <div className="hidden h-8 w-px bg-border sm:block" />
+              <div className="px-1 py-2 sm:py-0">
+                <Select value={type} onValueChange={setType}>
+                  <SelectTrigger className="h-10 w-full rounded-xl border-0 bg-transparent text-sm font-medium shadow-none focus:ring-0 sm:w-36">
+                    <SelectValue placeholder="Property Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="apartment">Apartment</SelectItem>
+                    <SelectItem value="house">House</SelectItem>
+                    <SelectItem value="villa">Villa</SelectItem>
+                    <SelectItem value="penthouse">Penthouse</SelectItem>
+                    <SelectItem value="land">Land</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                onClick={handleSearch}
+                className="mt-2 h-12 w-full rounded-xl bg-primary px-6 font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 transition-all sm:mt-0 sm:w-auto"
+              >
+                <Search className="mr-2 h-4 w-4" />
+                Search
+              </Button>
             </div>
-            <Button
-              onClick={handleSearch}
-              className="mt-2 h-12 w-full rounded-xl bg-primary px-6 font-semibold text-primary-foreground hover:bg-primary/90 sm:mt-0 sm:w-auto"
-            >
-              <Search className="mr-2 h-4 w-4" />
-              Search
-            </Button>
           </div>
 
           {/* Trust stats */}
@@ -111,27 +153,30 @@ export const Hero = () => {
             </div>
 
             {/* Floating mini property card */}
-            <div className="absolute -bottom-5 right-2 w-56 rounded-2xl bg-card/95 p-2.5 shadow-hard backdrop-blur sm:right-6 sm:w-64">
+            <Link
+              to="/property/demo-2"
+              className="group absolute -bottom-5 right-2 w-56 rounded-2xl bg-card/95 p-2.5 shadow-hard backdrop-blur transition-all duration-300 hover:-translate-y-1 sm:right-6 sm:w-64 block border border-border/70"
+            >
               <div className="relative overflow-hidden rounded-xl">
-                <img src={floatImage} alt="Villa" className="h-24 w-full object-cover" />
-                <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2.5 py-0.5 text-[10px] font-semibold text-primary">
+                <img src={floatImage} alt="Villa" className="h-24 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <span className="absolute left-2 top-2 rounded-full bg-background/95 border border-border/60 px-2.5 py-0.5 text-[10px] font-semibold text-foreground backdrop-blur">
                   For Sale
                 </span>
               </div>
               <div className="px-1 pt-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-foreground">Villa in Veternik</span>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white">
+                  <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">Villa in Veternik</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background transition-transform group-hover:scale-110">
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
                 <div className="mt-1 flex items-center gap-3 text-[11px] text-muted-foreground">
-                  <span className="flex items-center gap-1"><Bed className="h-3 w-3 text-primary" /> 5</span>
-                  <span className="flex items-center gap-1"><Bath className="h-3 w-3 text-primary" /> 3</span>
+                  <span className="flex items-center gap-1"><Bed className="h-3 w-3 text-muted-foreground" /> 5</span>
+                  <span className="flex items-center gap-1"><Bath className="h-3 w-3 text-muted-foreground" /> 3</span>
                   <span className="ml-auto font-bold text-foreground">€420,000</span>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </div>

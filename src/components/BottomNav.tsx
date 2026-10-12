@@ -1,10 +1,10 @@
-import { Home, LayoutGrid, Heart, MapPin, User } from "lucide-react";
+import { Home, LayoutGrid, Layers, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const tabs = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/properties", icon: LayoutGrid, label: "Properties" },
-  { to: "/properties-map", icon: MapPin, label: "Map" },
+  { to: "/services", icon: Layers, label: "Services" },
   { to: "/contact", icon: User, label: "Contact" },
 ];
 
