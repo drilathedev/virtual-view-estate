@@ -4,19 +4,28 @@ import { useQuery } from "@tanstack/react-query";
 import { listProperties, Property } from "@/lib/properties";
 import { Bell, Search, SlidersHorizontal, Bed, Bath, Star, Square, MapPin, Loader2, ArrowUpRight } from "lucide-react";
 
-const categories = ["Të gjitha", "Vila", "Apartamente", "Blej & Shes"];
+const categories = ["All", "Villas", "Apartments", "For Sale", "For Rent"];
 
 export const MobileHome = () => {
   const navigate = useNavigate();
-  const [active, setActive] = useState("Të gjitha");
+  const [active, setActive] = useState("All");
   const [q, setQ] = useState("");
   const { data: properties = [], isLoading } = useQuery<Property[]>({
     queryKey: ["properties"],
     queryFn: listProperties,
   });
 
-  const featured = properties[0];
-  const rest = properties.slice(1);
+  const filteredProperties = properties.filter((p) => {
+    if (active === "All") return true;
+    if (active === "Villas") return p.type?.toLowerCase() === "villa" || p.title.toLowerCase().includes("villa");
+    if (active === "Apartments") return p.type?.toLowerCase() === "apartment" || p.title.toLowerCase().includes("apartment");
+    if (active === "For Sale") return !p.forRent;
+    if (active === "For Rent") return !!p.forRent;
+    return true;
+  });
+
+  const featured = filteredProperties[0];
+  const rest = filteredProperties.slice(1);
 
   const submit = () => navigate(q.trim() ? `/properties?q=${encodeURIComponent(q.trim())}` : "/properties");
 
@@ -29,13 +38,13 @@ export const MobileHome = () => {
             P
           </span>
           <div>
-            <p className="text-xs text-muted-foreground">Mirëmëngjes 👋</p>
-            <p className="text-base font-bold text-foreground">Mirë se vjen</p>
+            <p className="text-xs text-muted-foreground">Hello 👋</p>
+            <p className="text-base font-bold text-foreground">Welcome to PRONA360</p>
           </div>
         </div>
-        <button className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-soft" aria-label="Njoftimet">
+        <Link to="/contact" className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-soft" aria-label="Notifications">
           <Bell className="h-5 w-5 text-foreground/70" />
-        </button>
+        </Link>
       </header>
 
       {/* Search */}
@@ -46,11 +55,11 @@ export const MobileHome = () => {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submit()}
-            placeholder="Kërko këtu..."
+            placeholder="Search properties, cities..."
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
-        <button onClick={submit} className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-[#1a8a8a] text-white shadow-soft" aria-label="Filtra">
+        <button onClick={submit} className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-[#1a8a8a] text-white shadow-soft transition-transform active:scale-95" aria-label="Filters">
           <SlidersHorizontal className="h-5 w-5" />
         </button>
       </div>
@@ -61,7 +70,7 @@ export const MobileHome = () => {
           <button
             key={c}
             onClick={() => setActive(c)}
-            className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
+            className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${
               active === c ? "bg-primary text-primary-foreground shadow-soft" : "bg-card text-foreground/60 shadow-soft"
             }`}
           >
@@ -74,18 +83,25 @@ export const MobileHome = () => {
         <div className="flex justify-center py-20">
           <Loader2 className="h-7 w-7 animate-spin text-primary" />
         </div>
+      ) : filteredProperties.length === 0 ? (
+        <div className="py-16 text-center">
+          <p className="text-sm text-muted-foreground">No properties found in this category.</p>
+          <button onClick={() => setActive("All")} className="mt-3 text-sm font-semibold text-primary underline">
+            Show all properties
+          </button>
+        </div>
       ) : (
         <>
           {/* Featured */}
           {featured && (
-            <Link to={`/property/${featured.id}`} className="mt-6 block rounded-[1.75rem] bg-card p-3 shadow-medium">
+            <Link to={`/property/${featured.id}`} className="mt-6 block rounded-[1.75rem] bg-card p-3 shadow-medium transition-transform active:scale-[0.99]">
               <div className="relative overflow-hidden rounded-[1.4rem]">
                 <img src={featured.image} alt={featured.title} className="h-56 w-full object-cover" />
                 <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary backdrop-blur">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
                 <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
-                  {featured.forRent ? "Me Qira" : "Në Shitje"}
+                  {featured.forRent ? "For Rent" : "For Sale"}
                 </span>
               </div>
               <div className="px-1.5 pb-1 pt-3.5">
@@ -98,12 +114,14 @@ export const MobileHome = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-muted-foreground">{featured.forRent ? "Muaj" : "Çmimi"}</div>
-                    <div className="text-lg font-extrabold text-foreground">€{featured.price}</div>
+                    <div className="text-xs text-muted-foreground">{featured.forRent ? "/mo" : "Price"}</div>
+                    <div className="text-lg font-extrabold text-foreground">
+                      {featured.price.startsWith("€") ? featured.price : `€${featured.price}`}
+                    </div>
                   </div>
                 </div>
                 <div className="mt-3.5 flex items-center gap-2">
-                  <Stat icon={Bed} text={`${featured.beds} dhoma`} tone="terracotta" />
+                  <Stat icon={Bed} text={`${featured.beds} beds`} tone="terracotta" />
                   <Stat icon={Star} text={(featured.rating ?? 4.9).toFixed(1)} tone="amber" />
                   <Stat icon={Square} text={`${featured.area} m²`} tone="teal" />
                 </div>
@@ -112,33 +130,39 @@ export const MobileHome = () => {
           )}
 
           {/* Recommendation */}
-          <div className="mt-7 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-foreground">Rekomandime</h2>
-            <Link to="/properties" className="text-sm font-semibold text-primary">Shiko të gjitha</Link>
-          </div>
+          {rest.length > 0 && (
+            <>
+              <div className="mt-7 flex items-center justify-between">
+                <h2 className="text-lg font-bold text-foreground">Recommended</h2>
+                <Link to="/properties" className="text-sm font-semibold text-primary">View all</Link>
+              </div>
 
-          <div className="no-scrollbar -mx-5 mt-3 flex gap-4 overflow-x-auto px-5 pb-2">
-            {rest.map((p) => (
-              <Link key={p.id} to={`/property/${p.id}`} className="w-64 shrink-0 rounded-[1.4rem] bg-card p-2.5 shadow-soft">
-                <div className="relative overflow-hidden rounded-[1.1rem]">
-                  <img src={p.image} alt={p.title} className="h-32 w-full object-cover" />
-                  <span className="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-semibold text-primary backdrop-blur">
-                    {p.forRent ? "Me Qira" : "Në Shitje"}
-                  </span>
-                </div>
-                <div className="px-1 pt-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="line-clamp-1 text-sm font-bold text-foreground">{p.title}</h3>
-                    <span className="shrink-0 text-sm font-extrabold text-primary">€{p.price}</span>
-                  </div>
-                  <div className="mt-1 flex items-center text-xs text-muted-foreground">
-                    <MapPin className="mr-1 h-3 w-3 text-primary" />
-                    <span className="line-clamp-1">{p.location}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+              <div className="no-scrollbar -mx-5 mt-3 flex gap-4 overflow-x-auto px-5 pb-2">
+                {rest.map((p) => (
+                  <Link key={p.id} to={`/property/${p.id}`} className="w-64 shrink-0 rounded-[1.4rem] bg-card p-2.5 shadow-soft transition-transform active:scale-[0.98]">
+                    <div className="relative overflow-hidden rounded-[1.1rem]">
+                      <img src={p.image} alt={p.title} className="h-32 w-full object-cover" />
+                      <span className="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-semibold text-primary backdrop-blur">
+                        {p.forRent ? "For Rent" : "For Sale"}
+                      </span>
+                    </div>
+                    <div className="px-1 pt-2.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="line-clamp-1 text-sm font-bold text-foreground">{p.title}</h3>
+                        <span className="shrink-0 text-sm font-extrabold text-primary">
+                          {p.price.startsWith("€") ? p.price : `€${p.price}`}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex items-center text-xs text-muted-foreground">
+                        <MapPin className="mr-1 h-3 w-3 text-primary" />
+                        <span className="line-clamp-1">{p.location}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

@@ -23,8 +23,8 @@ const Contact = () => {
     // Validation
     if (!name || !email || !message) {
       toast({
-        title: "Gabim",
-        description: "Ju lutem plotësoni të gjitha fushat e nevojshme.",
+        title: "Error",
+        description: "Please fill in all required fields.",
         variant: "destructive",
       });
       return;
@@ -45,13 +45,13 @@ const Contact = () => {
 
       if (telegramSent) {
         toast({
-          title: "Faleminderit!",
-          description: "Mesazhi juaj u dërgua me sukses. Do të kontaktoheni shpejt.",
+          title: "Thank you!",
+          description: "Your message has been sent successfully. We will get back to you shortly.",
         });
       } else {
         toast({
-          title: "Mesazhi u dërgua",
-          description: "Do të kontaktoheni shpejt.",
+          title: "Message sent",
+          description: "We will get in touch with you soon.",
         });
       }
       
@@ -66,8 +66,8 @@ const Contact = () => {
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: "Gabim",
-        description: "Diçka shkoi gabim. Ju lutem provoni përsëri.",
+        title: "Error",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
       setIsSubmitting(false);
@@ -82,10 +82,10 @@ const Contact = () => {
         <div className="border-b border-border/70 bg-secondary/40 py-14 lg:py-16">
           <div className="container-custom">
             <div className="max-w-3xl mx-auto text-center space-y-4">
-              <span className="chip bg-primary/10 text-primary">Na kontakto</span>
-              <h1 className="text-foreground">Na Kontaktoni</h1>
+              <span className="chip bg-primary/10 text-primary">Get in Touch</span>
+              <h1 className="text-foreground">Contact Us</h1>
               <p className="text-lg text-muted-foreground">
-                Jemi këtu për t'ju ndihmuar. Kontaktoni ekipin tonë për çdo pyetje ose kërkesë.
+                We're here to help. Reach out to our team with any questions or listing inquiries.
               </p>
             </div>
           </div>
@@ -100,7 +100,7 @@ const Contact = () => {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
                     <Phone className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="mb-2 font-semibold text-foreground">Telefon</h3>
+                  <h3 className="mb-2 font-semibold text-foreground">Phone</h3>
                   <a href="tel:+38349295636" className="text-primary hover:underline">
                     +383 49 295 636
                   </a>
@@ -120,9 +120,9 @@ const Contact = () => {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary">
                     <MapPin className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="mb-2 font-semibold text-foreground">Lokacioni</h3>
+                  <h3 className="mb-2 font-semibold text-foreground">Location</h3>
                   <p className="text-muted-foreground">
-                    Drenas, Kosovë
+                    Drenas, Kosovo
                   </p>
                 </div>
               </div>
@@ -130,15 +130,15 @@ const Contact = () => {
               {/* Contact Form */}
               <div className="lg:col-span-2">
                 <div className="rounded-3xl border border-border/70 bg-card p-8 shadow-soft">
-                  <h2 className="mb-6 text-2xl font-bold text-foreground">Dërgoni një mesazh</h2>
+                  <h2 className="mb-6 text-2xl font-bold text-foreground">Send Us a Message</h2>
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="mb-2 block text-sm font-medium text-foreground/80">
-                          Emri <span className="text-destructive">*</span>
+                          Full Name <span className="text-destructive">*</span>
                         </label>
                         <Input
-                          placeholder="Emri juaj"
+                          placeholder="Your full name"
                           className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
@@ -162,10 +162,10 @@ const Contact = () => {
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-foreground/80">
-                        Telefon
+                        Phone Number
                       </label>
                       <Input
-                        placeholder="Numri i telefonit"
+                        placeholder="+383 49 123 456"
                         className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
@@ -174,10 +174,10 @@ const Contact = () => {
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-foreground/80">
-                        Mesazhi <span className="text-destructive">*</span>
+                        Message <span className="text-destructive">*</span>
                       </label>
                       <Textarea
-                        placeholder="Si mund t'ju ndihmojmë?"
+                        placeholder="How can we help you?"
                         className="min-h-[150px] rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
@@ -191,16 +191,16 @@ const Contact = () => {
                       className="h-12 w-full rounded-full bg-primary px-8 font-semibold text-primary-foreground hover:bg-primary/90 shadow-glow disabled:opacity-50 md:w-auto"
                     >
                       <Send className="mr-2 h-4 w-4" />
-                      {isSubmitting ? 'Duke dërguar...' : 'Dërgo Mesazhin'}
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                   </form>
                 </div>
 
                 {/* Info Box */}
                 <div className="mt-6 rounded-3xl border border-primary/20 bg-primary/5 p-6">
-                  <h3 className="mb-2 font-semibold text-foreground">Për të listuar një pronë</h3>
+                  <h3 className="mb-2 font-semibold text-foreground">Looking to list a property?</h3>
                   <p className="text-sm text-muted-foreground">
-                    Nëse dëshironi të shtoni pronën tuaj në platformën tonë, na kontaktoni drejtpërdrejt në email ose telefon. Ekipi ynë do t'ju ndihmojë me të gjithë procesin.
+                    If you would like to feature your property on our platform with 360° virtual tours, reach out directly by email or phone. Our team will guide you through the entire process.
                   </p>
                 </div>
               </div>

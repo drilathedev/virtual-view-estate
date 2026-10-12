@@ -59,7 +59,7 @@ export function Kuula3DViewer({ kuulaId, title, fallbackImage, fallbackGallery, 
   if (!kuulaId) {
     return (
       <div className="w-full bg-muted rounded-lg flex items-center justify-center h-96">
-        <p className="text-muted-foreground">Nuk ka tur 3D të disponueshëm</p>
+        <p className="text-muted-foreground">No 3D virtual tour available</p>
       </div>
     );
   }
@@ -75,7 +75,7 @@ export function Kuula3DViewer({ kuulaId, title, fallbackImage, fallbackGallery, 
         {fallbackGallery && fallbackGallery.length > 0 && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
             <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">
-              {fallbackGallery.length} foto të disponueshme
+              {fallbackGallery.length} photos available
             </div>
           </div>
         )}
@@ -90,7 +90,7 @@ export function Kuula3DViewer({ kuulaId, title, fallbackImage, fallbackGallery, 
         <div className="absolute inset-0 bg-muted flex items-center justify-center z-10">
           <div className="text-center space-y-3">
             <div className="w-12 h-12 border-4 border-accent/30 border-t-accent rounded-full animate-spin mx-auto" />
-            <p className="text-sm text-muted-foreground">Po ngarkohet turi 3D...</p>
+            <p className="text-sm text-muted-foreground">Loading 3D virtual tour...</p>
           </div>
         </div>
       )}
@@ -101,7 +101,7 @@ export function Kuula3DViewer({ kuulaId, title, fallbackImage, fallbackGallery, 
           <Alert className="bg-yellow-50 border-yellow-200">
             <AlertCircle className="h-4 w-4 text-yellow-600" />
             <AlertDescription className="text-sm text-yellow-800">
-              Turi 3D mund të mos funksionojë në disa vende për shkak të kufizimeve gjeografike.
+              The 3D tour might be unavailable in certain regions due to provider restrictions.
               {fallbackImage && (
                 <>
                   {' '}
@@ -110,7 +110,7 @@ export function Kuula3DViewer({ kuulaId, title, fallbackImage, fallbackGallery, 
                     className="h-auto p-0 text-yellow-900 underline font-semibold"
                     onClick={handleUseFallback}
                   >
-                    Shiko fotot në vend të kësaj
+                    View photos instead
                   </Button>
                 </>
               )}
@@ -149,7 +149,7 @@ export function Kuula3DViewer({ kuulaId, title, fallbackImage, fallbackGallery, 
             className="bg-accent hover:bg-accent/90 text-white shadow-lg"
           >
             <ImageIcon className="h-4 w-4 mr-2" />
-            Shiko Fotot
+            View Photos
           </Button>
         </div>
       )}

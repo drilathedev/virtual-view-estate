@@ -32,8 +32,8 @@ export const PropertyInquiryForm = ({
     // Validation
     if (!name || !email || !message) {
       toast({
-        title: 'Gabim',
-        description: 'Ju lutem plotësoni të gjitha fushat e nevojshme.',
+        title: 'Error',
+        description: 'Please fill in all required fields.',
         variant: 'destructive',
       });
       return;
@@ -60,14 +60,14 @@ export const PropertyInquiryForm = ({
 
       if (telegramSent) {
         toast({
-          title: 'Faleminderit!',
+          title: 'Thank You!',
           description:
-            'Kërkesa juaj u dërgua me sukses. Do të kontaktoheni shpejt.',
+            'Your inquiry has been sent successfully. Our team will contact you shortly.',
         });
       } else {
         toast({
-          title: 'Kërkesa u pranua',
-          description: 'Do të kontaktoheni shpejt.',
+          title: 'Inquiry Received',
+          description: 'Our team will contact you shortly.',
         });
       }
 
@@ -85,8 +85,8 @@ export const PropertyInquiryForm = ({
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: 'Gabim',
-        description: 'Diçka shkoi gabim. Ju lutem provoni përsëri.',
+        title: 'Error',
+        description: 'Something went wrong. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -97,16 +97,16 @@ export const PropertyInquiryForm = ({
   return (
     <Card className="shadow-medium hover:shadow-hard transition-shadow">
       <CardHeader className="border-b">
-        <CardTitle className="text-lg">Kërkesë për Pronën</CardTitle>
+        <CardTitle className="text-lg">Property Inquiry</CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground/80 mb-1">
-              Emri <span className="text-destructive">*</span>
+              Full Name <span className="text-destructive">*</span>
             </label>
             <Input
-              placeholder="Emri juaj"
+              placeholder="Your full name"
               className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -117,7 +117,7 @@ export const PropertyInquiryForm = ({
 
           <div>
             <label className="block text-sm font-medium text-foreground/80 mb-1">
-              Email <span className="text-destructive">*</span>
+              Email Address <span className="text-destructive">*</span>
             </label>
             <Input
               type="email"
@@ -132,11 +132,11 @@ export const PropertyInquiryForm = ({
 
           <div>
             <label className="block text-sm font-medium text-foreground/80 mb-1">
-              Telefon
+              Phone Number
             </label>
             <Input
               type="tel"
-              placeholder="Numri i telefonit"
+              placeholder="e.g. +383 49 123 456"
               className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -146,10 +146,10 @@ export const PropertyInquiryForm = ({
 
           <div>
             <label className="block text-sm font-medium text-foreground/80 mb-1">
-              Tipi i Interesit
+              Interest Type
             </label>
             <Input
-              placeholder="Shitje, Blerje, Qira, etj."
+              placeholder="Buying, Renting, Investment, etc."
               className="h-11 rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={interest}
               onChange={(e) => setInterest(e.target.value)}
@@ -159,10 +159,10 @@ export const PropertyInquiryForm = ({
 
           <div>
             <label className="block text-sm font-medium text-foreground/80 mb-1">
-              Mesazhi <span className="text-destructive">*</span>
+              Message <span className="text-destructive">*</span>
             </label>
             <Textarea
-              placeholder="Plotëso detajet e kërkesës tuaj..."
+              placeholder="Tell us about your requirements or questions..."
               className="min-h-[100px] rounded-2xl bg-secondary/60 border-input focus-visible:ring-primary"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -179,12 +179,12 @@ export const PropertyInquiryForm = ({
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Duke dërguar...
+                Sending Inquiry...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Dërgo Kërkesën
+                Send Inquiry
               </>
             )}
           </Button>

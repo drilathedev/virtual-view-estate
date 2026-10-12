@@ -37,7 +37,7 @@ export const PropertyCard = ({
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-primary shadow-soft backdrop-blur">
-            {forRent ? "Me Qira" : "Në Shitje"}
+            {forRent ? "For Rent" : "For Sale"}
           </span>
           <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white opacity-0 shadow-soft transition-opacity duration-300 group-hover:opacity-100">
             <ArrowUpRight className="h-4 w-4" />
@@ -52,11 +52,11 @@ export const PropertyCard = ({
               <>
                 <span className="flex items-center gap-1.5">
                   <Bed className="h-4 w-4 text-primary" />
-                  {beds} Dhoma
+                  {beds} Beds
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Bath className="h-4 w-4 text-primary" />
-                  {baths} Banjo
+                  {baths} Baths
                 </span>
               </>
             )}
@@ -72,8 +72,8 @@ export const PropertyCard = ({
 
           <div className="mt-1.5 flex items-baseline gap-3">
             <span className="text-lg font-bold text-foreground">
-              €{price}
-              {forRent && <span className="text-sm font-normal text-muted-foreground">/muaj</span>}
+              {price.startsWith("€") ? price : `€${price}`}
+              {forRent && <span className="text-sm font-normal text-muted-foreground">/mo</span>}
             </span>
             <span className="truncate text-xs text-muted-foreground">{location}</span>
           </div>

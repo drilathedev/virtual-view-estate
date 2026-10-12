@@ -5,21 +5,21 @@ import client from "@/assets/property-1.jpg";
 const reviews = [
   {
     quote:
-      "Puna me këtë ekip ishte një kënaqësi. Ata e kuptuan vizionin tonë dhe na ndihmuan të gjejmë një pronë që i tejkaloi pritshmëritë. Nuk do ta kishim arritur pa ta!",
+      "Working with this team was a true pleasure. They understood our requirements and helped us secure an extraordinary property that exceeded our expectations. Highly recommended!",
     name: "Sajbur Rahman",
-    role: "Dizajner UI/UX",
+    role: "Product Designer",
   },
   {
     quote:
-      "Procesi ishte transparent dhe i shpejtë. Turi virtual 3D më ndihmoi të vendos pa humbur kohë me vizita të panevojshme. Shërbim vërtet profesional.",
+      "The entire process was transparent and remarkably efficient. The 360° virtual tour enabled me to explore every detail and make a confident decision without wasting hours on commute.",
     name: "Arta Hoxha",
-    role: "Pronare biznesi",
+    role: "Business Owner",
   },
   {
     quote:
-      "Gjeta shtëpinë time të ëndrrave brenda javësh. Ekipi ishte gjithmonë në dispozicion dhe çdo detaj u trajtua me kujdes. E rekomandoj fuqishëm!",
+      "Found our dream family home within weeks. Their advisors were always available to assist, and every legal and logistical step was handled with supreme professionalism.",
     name: "Besim Krasniqi",
-    role: "Inxhinier",
+    role: "Senior Engineer",
   },
 ];
 
@@ -32,7 +32,7 @@ export const Testimonials = () => {
       <div className="container-custom">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <h2 className="max-w-xs text-foreground">
-            Çfarë thonë <span className="font-accent font-normal">klientët</span> për ne
+            What our <span className="font-accent font-normal text-primary">clients say</span> about us
           </h2>
           <div className="flex items-center gap-3">
             <div className="flex -space-x-3">
@@ -46,23 +46,23 @@ export const Testimonials = () => {
               ))}
             </div>
             <div className="text-sm">
-              <div className="font-semibold text-foreground">Më shumë se 500+</div>
-              <div className="text-muted-foreground">Vlerësime klientësh</div>
+              <div className="font-semibold text-foreground">Over 500+</div>
+              <div className="text-muted-foreground">Satisfied Client Reviews</div>
             </div>
           </div>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-5">
           {/* Photo */}
-          <div className="overflow-hidden rounded-[1.75rem] lg:col-span-2">
+          <div className="overflow-hidden rounded-[1.75rem] shadow-soft lg:col-span-2">
             <img src={client} alt={r.name} className="h-72 w-full object-cover lg:h-full" />
           </div>
 
           {/* Quote card */}
-          <div className="relative flex flex-col justify-between rounded-[1.75rem] bg-leaf p-8 text-white lg:col-span-3 lg:p-12">
+          <div className="relative flex flex-col justify-between rounded-[1.75rem] bg-leaf p-8 text-white shadow-soft lg:col-span-3 lg:p-12">
             <Quote className="h-10 w-10 fill-white/20 text-white/20" />
             <p className="my-6 font-display text-xl font-medium leading-relaxed lg:text-2xl">
-              {r.quote}
+              "{r.quote}"
             </p>
             <div className="flex items-end justify-between">
               <div>
@@ -71,8 +71,8 @@ export const Testimonials = () => {
               </div>
               <button
                 onClick={() => setI((i + 1) % reviews.length)}
-                aria-label="Vlerësimi tjetër"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/25"
+                aria-label="Next review"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white transition-all hover:bg-white/25 active:scale-95"
               >
                 <ArrowRight className="h-5 w-5" />
               </button>

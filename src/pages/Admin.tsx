@@ -94,13 +94,13 @@ export default function Admin() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['properties'] });
       setForm(emptyForm);
-      toast({ title: 'Pronë u krijua', description: 'Lista e pronës u krijua me sukses.' });
+      toast({ title: 'Property created', description: 'Property listing created successfully.' });
     },
     onError: (err: unknown) => {
       // Log full error details (including non-enumerable props like code) to help debugging
       console.error('[create] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
       const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
-      toast({ title: 'Krijimi dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
+      toast({ title: 'Creation failed', description: msg || 'Unknown error', variant: 'destructive' });
     }
   });
 
@@ -110,13 +110,13 @@ export default function Admin() {
       qc.invalidateQueries({ queryKey: ['properties'] });
       setForm(emptyForm);
       setEditingId(null);
-      toast({ title: 'Pronë u përditësua', description: 'Pronë u përditësua me sukses.' });
+      toast({ title: 'Property updated', description: 'Property updated successfully.' });
     }
     ,
     onError: (err: unknown) => {
       console.error('[update] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
       const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
-      toast({ title: 'Përditësimi dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
+      toast({ title: 'Update failed', description: msg || 'Unknown error', variant: 'destructive' });
     }
   });
 
@@ -126,7 +126,7 @@ export default function Admin() {
     onError: (err: unknown) => {
       console.error('[delete] failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
       const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
-      toast({ title: 'Fshirja dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
+      toast({ title: 'Deletion failed', description: msg || 'Unknown error', variant: 'destructive' });
     }
   });
 
@@ -160,7 +160,7 @@ export default function Admin() {
       baths: p.baths,
       area: p.area,
       mediaType: p.mediaType,
-        type: (p as any).type || '',
+      type: (p as any).type || '',
       forRent: p.forRent || false,
       image: p.image,
       description: p.description || '',
@@ -211,7 +211,7 @@ export default function Admin() {
       // mutateAsync will throw if the mutation fails — catch it so the UI doesn't get stuck
       console.error('[submit] mutation failed', err, JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2));
       const msg = err instanceof Error ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err as object));
-      toast({ title: 'Ruajtja dështoi', description: msg || 'Gabim i panjohur', variant: 'destructive' });
+      toast({ title: 'Save failed', description: msg || 'Unknown error', variant: 'destructive' });
     }
   }
 
@@ -222,15 +222,15 @@ export default function Admin() {
 
   async function handleImageFile(file?: File) {
     if (!file) return;
-      if (!user) {
-      toast({ title: 'Nuk jeni i kyçur', description: 'Ju lutem hyni për të ngarkuar fotografi.', variant: 'destructive' });
+    if (!user) {
+      toast({ title: 'Not signed in', description: 'Please sign in to upload images.', variant: 'destructive' });
       return;
     }
     setUploadingImage(true);
     try {
       const url = await uploadFile(file, 'property-images');
       handleChange('image', url);
-      toast({ title: 'Foto e ngarkuar', description: 'Skedari u ngarkua në Storage.', });
+      toast({ title: 'Image uploaded', description: 'File uploaded to storage successfully.' });
     } catch (err: unknown) {
       console.error('[upload] image failed', err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -243,8 +243,8 @@ export default function Admin() {
 
   async function handleVideoFile(file?: File) {
     if (!file) return;
-      if (!user) {
-      toast({ title: 'Nuk jeni i kyçur', description: 'Ju lutem hyni për të ngarkuar video.', variant: 'destructive' });
+    if (!user) {
+      toast({ title: 'Not signed in', description: 'Please sign in to upload videos.', variant: 'destructive' });
       return;
     }
     setUploadingVideo(true);
@@ -252,7 +252,7 @@ export default function Admin() {
       const url = await uploadFile(file, 'property-videos');
       handleChange('videoUrl', url);
       handleChange('mediaType', 'video');
-      toast({ title: 'Video e ngarkuar', description: 'Skedari u ngarkua në Storage.' });
+      toast({ title: 'Video uploaded', description: 'File uploaded to storage successfully.' });
     } catch (err: unknown) {
       console.error('[upload] video failed', err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -266,7 +266,7 @@ export default function Admin() {
   async function handleGalleryFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     if (!user) {
-      toast({ title: 'Nuk jeni i kyçur', description: 'Ju lutem hyni për të ngarkuar fotografi.', variant: 'destructive' });
+      toast({ title: 'Not signed in', description: 'Please sign in to upload images.', variant: 'destructive' });
       return;
     }
     setUploadingGallery(true);
@@ -275,7 +275,7 @@ export default function Admin() {
       const urls = await Promise.all(uploadPromises);
       const currentGallery = form.gallery || [];
       handleChange('gallery', [...currentGallery, ...urls]);
-      toast({ title: 'Fotot u ngarkuan', description: `${urls.length} foto u ngarkuan me sukses.` });
+      toast({ title: 'Images uploaded', description: `${urls.length} photos uploaded successfully.` });
     } catch (err: unknown) {
       console.error('[upload] gallery failed', err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -289,7 +289,7 @@ export default function Admin() {
     const currentGallery = form.gallery || [];
     const newGallery = currentGallery.filter((_, i) => i !== index);
     handleChange('gallery', newGallery);
-    toast({ title: 'Foto u fshi', description: 'Fotoja u hoq nga galeria.' });
+    toast({ title: 'Photo removed', description: 'Photo removed from gallery.' });
   }
 
   if (!loading && !isAdmin) return <Navigate to="/login" replace />;
@@ -302,7 +302,7 @@ export default function Admin() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-3xl md:text-4xl font-bold gradient-text">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Menaxho pronat dhe listingjet</p>
+            <p className="text-muted-foreground">Manage your properties and active listings</p>
           </div>
           <Button variant="secondary" onClick={() => logout()} className="gap-2">
             <LogOut className="h-4 w-4" />
@@ -314,15 +314,15 @@ export default function Admin() {
         <Card className="shadow-medium hover:shadow-hard transition-shadow">
           <CardHeader className="border-b bg-muted/50">
             <CardTitle className="flex items-center gap-3">
-                  {editingId ? (
+              {editingId ? (
                 <>
                   <Edit2 className="h-6 w-6 text-accent" />
-                  Ndrysho Pronën
+                  Edit Property
                 </>
               ) : (
                 <>
                   <Plus className="h-6 w-6 text-accent" />
-                  Krijo Pronë të Re
+                  Create New Property
                 </>
               )}
             </CardTitle>
@@ -339,7 +339,7 @@ export default function Admin() {
                   </h3>
                   <div className="space-y-4 p-4 rounded-lg border bg-card">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Titulli i Pronës *</label>
+                      <label className="text-sm font-medium text-foreground">Property Title *</label>
                       <Input 
                         placeholder="e.g., Luxury 2-Bedroom Apartment in City Center" 
                         value={form.title} 
@@ -349,9 +349,9 @@ export default function Admin() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Përshkrimi</label>
+                      <label className="text-sm font-medium text-foreground">Description</label>
                       <Textarea 
-                        placeholder="Përshkrim i detajuar i pronës, pajisjet dhe lagjina..." 
+                        placeholder="Detailed description of the property, amenities, surroundings..." 
                         value={form.description} 
                         onChange={e => handleChange('description', e.target.value)} 
                         className="min-h-[140px] resize-none" 
@@ -361,7 +361,7 @@ export default function Admin() {
                 </div>
                 {/* Property Details Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
+                  <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
                     <MapPin className="h-5 w-5 text-accent" />
                     Property Details
                   </h3>
@@ -370,9 +370,9 @@ export default function Admin() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
-                          Vendndodhja *</label>
+                          Location *</label>
                         <Input 
-                          placeholder="Shkruaj lokacionin..." 
+                          placeholder="Enter location (e.g. Pristina, Kosovo)..." 
                           value={form.location} 
                           onChange={e => handleChange('location', e.target.value)} 
                           className="h-11"
@@ -382,7 +382,7 @@ export default function Admin() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <DollarSign className="h-4 w-4 text-muted-foreground" />
-                          Çmimi *
+                          Price *
                         </label>
                         <Input 
                           placeholder="€120,000 or €800/month" 
@@ -393,7 +393,7 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Gjerësia Gjeografike (Latitude)</label>
+                        <label className="text-sm font-medium text-foreground">Latitude (Optional)</label>
                         <Input 
                           type="number" 
                           step="0.0001"
@@ -402,10 +402,10 @@ export default function Admin() {
                           onChange={e => handleChange('latitude', e.target.value === '' ? undefined : Number(e.target.value))} 
                           className="h-11"
                         />
-                        <p className="text-xs text-muted-foreground">P.sh. për Drenën: 42.6400, për Prishtinën: 42.6026</p>
+                        <p className="text-xs text-muted-foreground">e.g. for Drenas: 42.6400, for Pristina: 42.6026</p>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Gjatësia Gjeografike (Longitude)</label>
+                        <label className="text-sm font-medium text-foreground">Longitude (Optional)</label>
                         <Input 
                           type="number" 
                           step="0.0001"
@@ -414,15 +414,15 @@ export default function Admin() {
                           onChange={e => handleChange('longitude', e.target.value === '' ? undefined : Number(e.target.value))} 
                           className="h-11"
                         />
-                        <p className="text-xs text-muted-foreground">P.sh. për Drenën: 20.9500, për Prishtinën: 21.1584</p>
+                        <p className="text-xs text-muted-foreground">e.g. for Drenas: 20.9500, for Pristina: 21.1584</p>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Phone className="h-4 w-4 text-muted-foreground" />
-                          Numri i Kontaktit
+                          Contact Phone
                         </label>
                         <Input
-                          placeholder="049 123 456"
+                          placeholder="+383 49 123 456"
                           value={form.phone}
                           onChange={e => handleChange('phone', e.target.value)}
                           className="h-11"
@@ -431,7 +431,7 @@ export default function Admin() {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Mail className="h-4 w-4 text-muted-foreground" />
-                          Email i Pronës
+                          Contact Email
                         </label>
                         <Input
                           placeholder="prona360rks@gmail.com"
@@ -444,7 +444,7 @@ export default function Admin() {
                     
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Renditja e Shfaqjes (1 = Parë, 2 = Dytë, etj.)</label>
+                        <label className="text-sm font-medium text-foreground">Display Order (1 = First, 2 = Second, etc.)</label>
                         <Input 
                           type="number" 
                           min={1} 
@@ -453,15 +453,15 @@ export default function Admin() {
                           onChange={e => handleChange('order', e.target.value === '' ? undefined : Number(e.target.value))} 
                           className="h-11"
                         />
-                        <p className="text-xs text-muted-foreground">Pronë me numër më të ulët shfaqet e para. Pa vlerë = 999 (në fund)</p>
+                        <p className="text-xs text-muted-foreground">Properties with lower numbers appear first. Default = 999 (at the end)</p>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Bed className="h-4 w-4 text-muted-foreground" />
-                          Dhoma Gjumi *
+                          Bedrooms *
                         </label>
                         <Input 
                           type="number" 
@@ -474,9 +474,9 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Bath className="h-4 w-4 text-muted-foreground" />
-                          Banjo *
+                          Bathrooms *
                         </label>
                         <Input 
                           type="number" 
@@ -489,9 +489,9 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
                           <Square className="h-4 w-4 text-muted-foreground" />
-                          Sipërfaqe {form.mediaType === 'land' ? '(ha)' : '(m²)'} *
+                          Area {form.mediaType === 'land' ? '(ha)' : '(m²)'} *
                         </label>
                         <Input 
                           type="number" 
@@ -507,7 +507,7 @@ export default function Admin() {
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Statusi *</label>
+                        <label className="text-sm font-medium text-foreground">Status *</label>
                         <Select 
                           value={form.forRent ? 'yes' : 'no'} 
                           onValueChange={(value) => handleChange('forRent', value === 'yes')}
@@ -516,42 +516,42 @@ export default function Admin() {
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="no">For Sale (Në Shitje)</SelectItem>
-                            <SelectItem value="yes">For Rent (Me Qira)</SelectItem>
+                            <SelectItem value="no">For Sale</SelectItem>
+                            <SelectItem value="yes">For Rent</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-foreground">Lloji i Mediave *</label>
+                        <label className="text-sm font-medium text-foreground">Media Type *</label>
                         <Select 
                           value={form.mediaType}
                           onValueChange={(value) => handleChange('mediaType', value as FormState['mediaType'])}
                         >
                           <SelectTrigger className="h-11">
-                            <SelectValue placeholder="Zgjidh llojin" />
+                            <SelectValue placeholder="Select media type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="photo">📷 Foto</SelectItem>
+                            <SelectItem value="photo">📷 Photo</SelectItem>
                             <SelectItem value="video">🎥 Video</SelectItem>
-                            <SelectItem value="3d">🎮 Tur 3D</SelectItem>
-                            <SelectItem value="land">🌱 Toka</SelectItem>
+                            <SelectItem value="3d">🎮 3D Virtual Tour</SelectItem>
+                            <SelectItem value="land">🌱 Land</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
                     <div className="mt-4">
-                      <label className="text-sm font-medium text-foreground">Tipi i Pronës (Kategori) *</label>
+                      <label className="text-sm font-medium text-foreground">Property Category *</label>
                       <Select value={form.type || ''} onValueChange={(v) => handleChange('type', v)}>
                         <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Zgjidh kategorinë" />
+                          <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="apartment">Apartament</SelectItem>
-                          <SelectItem value="house">Shtëpi</SelectItem>
-                          <SelectItem value="villa">Vilë</SelectItem>
+                          <SelectItem value="apartment">Apartment</SelectItem>
+                          <SelectItem value="house">House</SelectItem>
+                          <SelectItem value="villa">Villa</SelectItem>
                           <SelectItem value="penthouse">Penthouse</SelectItem>
-                          <SelectItem value="land">Toka</SelectItem>
+                          <SelectItem value="land">Land</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -559,7 +559,7 @@ export default function Admin() {
                     <div className="space-y-3 p-4 rounded-lg border bg-card">
                       <label className="text-sm font-medium text-foreground flex items-center gap-2">
                         <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                        Galeria e Fotove (Shumë Foto)
+                        Photo Gallery (Multiple Photos)
                       </label>
                       <div className="flex items-center gap-2">
                         <label className="flex-1">
@@ -581,12 +581,12 @@ export default function Admin() {
                             {uploadingGallery ? (
                               <>
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                Duke ngarkuar...
+                                Uploading...
                               </>
                             ) : (
                               <>
                                 <Upload className="h-4 w-4" />
-                                Ngarko Shumë Foto
+                                Upload Gallery Photos
                               </>
                             )}
                           </Button>
@@ -615,14 +615,14 @@ export default function Admin() {
                         </div>
                       )}
                       <p className="text-xs text-muted-foreground mt-2">
-                        Zgjidhni shumë foto për të krijuar një galeri. Këto do të shfaqen në faqen e detajeve të pronës.
+                        Select multiple photos to create a gallery. These will appear on the property details page.
                       </p>
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-foreground flex items-center gap-2">
                         <Check className="h-4 w-4 text-muted-foreground" />
-                        Tiparet e Pronës
+                        Property Features & Amenities
                       </label>
                       <FeaturesInput
                         value={form.features}
@@ -645,7 +645,7 @@ export default function Admin() {
                   <div className="space-y-3 p-4 rounded-lg border bg-card">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
                       <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                      Imazhi Kryesor *
+                      Featured Image *
                     </label>
                     <Input 
                       placeholder="Image URL" 
@@ -677,7 +677,7 @@ export default function Admin() {
                           ) : (
                             <>
                               <Upload className="h-4 w-4" />
-                              Ngarko Foto
+                              Upload Image
                             </>
                           )}
                         </Button>
@@ -701,7 +701,7 @@ export default function Admin() {
                   <div className="space-y-3 p-4 rounded-lg border bg-card">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
                       <Video className="h-4 w-4 text-muted-foreground" />
-                      Video (Opsional)
+                      Video (Optional)
                     </label>
                     <Input 
                       placeholder="Video URL" 
@@ -733,7 +733,7 @@ export default function Admin() {
                           ) : (
                             <>
                               <Upload className="h-4 w-4" />
-                              Ngarko Video
+                              Upload Video
                             </>
                           )}
                         </Button>
@@ -752,7 +752,7 @@ export default function Admin() {
                   <div className="space-y-3 p-4 rounded-lg border bg-card">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
-                      Kuula 3D Tour ID (Opsional)
+                      Kuula 3D Tour ID (Optional)
                     </label>
                     <Input 
                       placeholder="e.g., COLLECTION_ID from Kuula share link" 
@@ -761,7 +761,7 @@ export default function Admin() {
                       className="h-11"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Zgjidh 'Tur 3D' si Media Type dhe vendos Kuula collection ID-në tuaj. Merr ID-në nga URL e share linkut Kuula.
+                      Select '3D Virtual Tour' as Media Type and enter your Kuula tour or collection ID.
                     </p>
                     {form.kuulaId && form.mediaType === '3d' && (
                       <div className="w-full rounded-lg overflow-hidden border border-border">
@@ -786,22 +786,22 @@ export default function Admin() {
             
             {/* Form Actions */}
             <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-                <Button 
+              <Button 
                 type="submit" 
                 variant="hero" 
                 size="lg"
                 disabled={createMut.isPending || updateMut.isPending}
                 className="gap-2 flex-1 sm:flex-initial"
               >
-                  {createMut.isPending || updateMut.isPending ? (
+                {createMut.isPending || updateMut.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {editingId ? 'Po përditësohet...' : 'Po krijohet...'}
+                    {editingId ? 'Updating...' : 'Creating...'}
                   </>
                 ) : (
                   <>
                     {editingId ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                    {editingId ? 'Përditëso Pronën' : 'Krijo Pronën'}
+                    {editingId ? 'Update Property' : 'Create Property'}
                   </>
                 )}
               </Button>
@@ -813,7 +813,7 @@ export default function Admin() {
                   onClick={() => { setEditingId(null); setForm(emptyForm); }}
                   className="flex-1 sm:flex-initial"
                 >
-                  Anulo
+                  Cancel
                 </Button>
               )}
             </div>
@@ -827,7 +827,7 @@ export default function Admin() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3">
                 <Building2 className="h-6 w-6 text-accent" />
-                Prona ({properties.length})
+                Properties ({properties.length})
               </CardTitle>
               {properties.length > 0 && (
                 <Badge variant="secondary" className="text-sm">
@@ -837,143 +837,143 @@ export default function Admin() {
             </div>
           </CardHeader>
           <CardContent className="p-6">
-              {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-16 space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-accent" />
-              <p className="text-muted-foreground">Po ngarkohen pronat...</p>
-            </div>
-          ) : properties.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 space-y-4 text-center">
-              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-                <Building2 className="h-10 w-10 text-muted-foreground" />
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                <Loader2 className="h-12 w-12 animate-spin text-accent" />
+                <p className="text-muted-foreground">Loading properties...</p>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold">Nuk ka prona akoma</h3>
-                <p className="text-muted-foreground max-w-sm">
-                  Filloni duke krijuar listimin e parë të pronës në seksionin e sipërm.
-                </p>
+            ) : properties.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 space-y-4 text-center">
+                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                  <Building2 className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold">No properties found</h3>
+                  <p className="text-muted-foreground max-w-sm">
+                    Get started by creating your first property listing above.
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
                     <tr className="text-left border-b-2 bg-muted/30">
-                    <th className="py-3 px-4 font-semibold">Foto</th>
-                    <th className="py-3 px-4 font-semibold">Pronë</th>
-                    <th className="py-3 px-4 font-semibold">Vendndodhja</th>
-                    <th className="py-3 px-4 font-semibold">Çmimi</th>
-                    <th className="py-3 px-4 font-semibold text-center">Detajet</th>
-                    <th className="py-3 px-4 font-semibold">Lloji</th>
-                    <th className="py-3 px-4 font-semibold">Renditje</th>
-                    <th className="py-3 px-4 font-semibold text-right">Veprimet</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {properties.map((p, idx) => (
-                    <tr 
-                      key={p.id} 
-                      className="border-b hover:bg-muted/50 transition-colors"
-                      style={{ animationDelay: `${idx * 0.05}s` }}
-                    >
-                      <td className="py-4 px-4">
-                        <div className="relative group">
-                          <img 
-                            src={p.image} 
-                            alt={p.title} 
-                            className="w-24 h-16 object-cover rounded-lg border-2 border-muted group-hover:border-accent transition-colors" 
-                          />
-                          {p.forRent && (
-                            <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5">
-                              Me Qira
-                            </Badge>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 max-w-[200px]">
-                        <div className="font-semibold text-foreground line-clamp-1 mb-1">{p.title}</div>
-                        {p.description && (
-                          <div className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">
-                            {p.description}
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          <span className="text-sm">{p.location}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="font-bold text-accent">{p.price}</div>
-                        {p.forRent && <div className="text-xs text-muted-foreground">per month</div>}
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Bed className="h-3 w-3" />
-                            {p.beds}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Bath className="h-3 w-3" />
-                            {p.baths}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Square className="h-3 w-3" />
-                            {p.area}m²
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <Badge 
-                          variant="outline" 
-                          className={
-                            p.mediaType === '3d' 
-                              ? 'border-accent text-accent' 
-                              : p.mediaType === 'video'
-                              ? 'border-purple-500 text-purple-500'
-                              : 'border-blue-500 text-blue-500'
-                          }
-                        >
-                          {p.mediaType === 'photo' && '📷'}
-                          {p.mediaType === 'video' && '🎥'}
-                          {p.mediaType === '3d' && '🎮'}
-                          {' '}{p.mediaType.toUpperCase()}
-                        </Badge>
-                      </td>
-                      <td className="py-4 px-4">
-                        <Badge variant="secondary" className="font-mono">
-                          #{(p as any).order || 999}
-                        </Badge>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex justify-end gap-2">
-                            <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={() => startEdit(p)}
-                            className="gap-1 hover:bg-accent hover:text-accent-foreground"
-                          >
-                            <Edit2 className="h-3 w-3" />
-                            Ndrysho
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="destructive" 
-                            onClick={() => deleteMut.mutate(p.id)} 
-                            disabled={deleteMut.isPending}
-                            className="gap-1"
-                          >
-                            {deleteMut.isPending ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-3 w-3" />
-                            )}
-                            Fshi
-                          </Button>
-                        </div>
-                      </td>
+                      <th className="py-3 px-4 font-semibold">Photo</th>
+                      <th className="py-3 px-4 font-semibold">Property</th>
+                      <th className="py-3 px-4 font-semibold">Location</th>
+                      <th className="py-3 px-4 font-semibold">Price</th>
+                      <th className="py-3 px-4 font-semibold text-center">Details</th>
+                      <th className="py-3 px-4 font-semibold">Media</th>
+                      <th className="py-3 px-4 font-semibold">Order</th>
+                      <th className="py-3 px-4 font-semibold text-right">Actions</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {properties.map((p, idx) => (
+                      <tr 
+                        key={p.id} 
+                        className="border-b hover:bg-muted/50 transition-colors"
+                        style={{ animationDelay: `${idx * 0.05}s` }}
+                      >
+                        <td className="py-4 px-4">
+                          <div className="relative group">
+                            <img 
+                              src={p.image} 
+                              alt={p.title} 
+                              className="w-24 h-16 object-cover rounded-lg border-2 border-muted group-hover:border-accent transition-colors" 
+                            />
+                            {p.forRent && (
+                              <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5">
+                                For Rent
+                              </Badge>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 max-w-[200px]">
+                          <div className="font-semibold text-foreground line-clamp-1 mb-1">{p.title}</div>
+                          {p.description && (
+                            <div className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">
+                              {p.description}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <MapPin className="h-3 w-3" />
+                            <span className="text-sm">{p.location}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="font-bold text-accent">{p.price}</div>
+                          {p.forRent && <div className="text-xs text-muted-foreground">per month</div>}
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <Bed className="h-3 w-3" />
+                              {p.beds}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Bath className="h-3 w-3" />
+                              {p.baths}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Square className="h-3 w-3" />
+                              {p.area}m²
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge 
+                            variant="outline" 
+                            className={
+                              p.mediaType === '3d' 
+                                ? 'border-accent text-accent' 
+                                : p.mediaType === 'video'
+                                ? 'border-purple-500 text-purple-500'
+                                : 'border-blue-500 text-blue-500'
+                            }
+                          >
+                            {p.mediaType === 'photo' && '📷'}
+                            {p.mediaType === 'video' && '🎥'}
+                            {p.mediaType === '3d' && '🎮'}
+                            {' '}{p.mediaType.toUpperCase()}
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge variant="secondary" className="font-mono">
+                            #{(p as any).order || 999}
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => startEdit(p)}
+                              className="gap-1 hover:bg-accent hover:text-accent-foreground"
+                            >
+                              <Edit2 className="h-3 w-3" />
+                              Edit
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive" 
+                              onClick={() => deleteMut.mutate(p.id)} 
+                              disabled={deleteMut.isPending}
+                              className="gap-1"
+                            >
+                              {deleteMut.isPending ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-3 w-3" />
+                              )}
+                              Delete
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
                   ))}
                 </tbody>
               </table>

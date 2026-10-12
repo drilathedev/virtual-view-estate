@@ -22,16 +22,24 @@ export const FeaturesInput: React.FC<FeaturesInputProps> = ({ value, onChange })
     onChange(value.filter(f => f !== feature));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addFeature();
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex gap-2">
         <Input
-          placeholder="Shto tipar të ri..."
+          placeholder="Add a feature (e.g. Garage, Balcony, Pool)..."
           value={input}
           onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="flex-1"
         />
-        <Button type="button" onClick={addFeature} disabled={!input.trim()}>
+        <Button type="button" onClick={addFeature} disabled={!input.trim()} aria-label="Add feature">
           <Plus className="h-4 w-4" />
         </Button>
       </div>
@@ -39,7 +47,7 @@ export const FeaturesInput: React.FC<FeaturesInputProps> = ({ value, onChange })
         {value.map((feature, idx) => (
           <li key={idx} className="flex items-center gap-2">
             <span className="text-sm bg-muted px-2 py-1 rounded">{feature}</span>
-            <Button type="button" size="sm" variant="destructive" onClick={() => removeFeature(feature)}>
+            <Button type="button" size="sm" variant="destructive" onClick={() => removeFeature(feature)} aria-label={`Remove ${feature}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </li>

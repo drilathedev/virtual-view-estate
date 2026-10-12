@@ -8,26 +8,26 @@ import { Button } from '@/components/ui/button';
 const services = [
   {
     icon: Box,
-    title: 'Tura Virtuale 360°',
-    desc: 'Krijim i tureve interaktive 360° që lejojnë blerësit të eksplorojnë pronën nga çdo cep, në çdo kohë.',
+    title: '360° Virtual Tours',
+    desc: 'Interactive 360° virtual tours allowing buyers to explore every corner of your property remotely anytime.',
     color: 'text-primary bg-primary/10',
   },
   {
     icon: Camera,
-    title: 'Fotografi Profesionale',
-    desc: 'Fotografi me cilësi të lartë që theksojnë pikat më të forta të pronës dhe rrisin interesimin.',
+    title: 'Professional Photography',
+    desc: 'High-resolution architectural photography showcasing the finest highlights and driving buyer engagement.',
     color: 'text-primary bg-secondary',
   },
   {
     icon: Video,
-    title: 'Vizualizim 3D & Video',
-    desc: 'Modelime 3D dhe video cinematike që ndihmojnë blerësit të shohin potencialin e plotë të pronës.',
+    title: '3D Walkthroughs & Video',
+    desc: 'Immersive 3D renderings and cinematic video walk-throughs displaying your property\'s full potential.',
     color: 'text-primary bg-accent/20',
   },
   {
     icon: Headphones,
-    title: 'Konsulencë',
-    desc: 'Mbështetje e dedikuar për pronarë dhe agjentë gjatë gjithë procesit të shitjes ose qirasë.',
+    title: 'Real Estate Consulting',
+    desc: 'Dedicated advisory for owners, developers, and agents throughout the sale or leasing process.',
     color: 'text-primary bg-primary/10',
   },
 ];
@@ -39,10 +39,10 @@ const Services = () => {
       <main className="pb-24">
         <div className="border-b border-border/70 bg-secondary/40">
           <div className="container-custom py-12 lg:py-16 text-center space-y-4 max-w-2xl mx-auto">
-            <span className="chip bg-primary/10 text-primary">Çfarë ofrojmë</span>
-            <h1 className="text-foreground">Shërbimet tona</h1>
+            <span className="chip bg-primary/10 text-primary">What We Offer</span>
+            <h1 className="text-foreground">Our Services</h1>
             <p className="text-muted-foreground">
-              Bashkojmë teknologjinë e fundit me ekspertizë lokale për të prezantuar pronën tënde në mënyrën më të mirë.
+              Combining state-of-the-art virtual technology with local market expertise to present your property at its absolute best.
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ const Services = () => {
           <div className="mt-10 text-center">
             <Link to="/contact">
               <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 font-semibold px-8 h-12 shadow-glow">
-                Na kontakto
+                Contact Us
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

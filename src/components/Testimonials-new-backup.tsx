@@ -5,16 +5,16 @@ const samples = [
   {
     id: 't1',
     name: 'Arta Hoxha',
-    location: 'Prishtinë',
-    quote: 'Shërbim fantastik! Tura 3D më ndihmoi të shoh shtëpinë në çdo detaj para se të vizitoja.',
+    location: 'Pristina',
+    quote: 'Fantastic service! The 3D virtual tour allowed me to explore every single detail of the apartment before booking a physical visit.',
     rating: 5,
     avatar: '👩‍💼'
   },
   {
     id: 't2',
     name: 'Besim Krasniqi',
-    location: 'Pejë',
-    quote: 'Sapo bleva një pronë falë fotove profesionale — proces i shpejtë dhe transparent.',
+    location: 'Peja',
+    quote: 'We closed on our house thanks to the high quality architectural photos — fast, transparent, and responsive team.',
     rating: 5,
     avatar: '👨‍💼'
   },
@@ -22,7 +22,7 @@ const samples = [
     id: 't3',
     name: 'Drita Berisha',
     location: 'Prizren',
-    quote: 'Koncepti 3D ishte vendimtar për të parë potencialin e ndërtesës sonë.',
+    quote: 'The 3D walkthrough was crucial in visualizing the true layout and spatial flow of the commercial building.',
     rating: 5,
     avatar: '👩'
   }
@@ -40,11 +40,11 @@ export const Testimonials = () => {
       <div className="container-custom relative z-10">
         <div className="text-center mb-16 space-y-4 animate-fade-in">
           <div className="inline-block px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full text-sm font-semibold mb-2">
-            ⭐ Vlerësimet Tona
+            ⭐ Client Reviews
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Dëshmi nga Klientët</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">What Our Clients Say</h2>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">
-            Lexoni përvojat e klientëve tanë që kanë përdorur shërbimet tona.
+            Read authentic experiences and stories from home buyers and property investors who trusted our platform.
           </p>
         </div>
 

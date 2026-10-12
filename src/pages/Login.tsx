@@ -27,7 +27,7 @@ export default function Login() {
       await login(email, password);
     } catch (err: unknown) {
       const error = err as Error;
-      setError(error.message || 'Hyrja dështoi');
+      setError(error.message || 'Login failed. Please check your credentials.');
     } finally {
       setSubmitting(false);
     }
@@ -43,21 +43,21 @@ export default function Login() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 mb-4">
               <Shield className="h-8 w-8 text-accent" />
             </div>
-            <h1 className="text-3xl font-bold">Hyrje Admin</h1>
-            <p className="text-muted-foreground">Hyni për të menaxhuar pronat tuaja</p>
+            <h1 className="text-3xl font-bold">Admin Sign In</h1>
+            <p className="text-muted-foreground">Sign in to manage your property listings</p>
           </div>
 
           {/* Login Card */}
           <Card className="shadow-medium hover:shadow-hard transition-shadow">
-              <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-xl text-center">Mirësevini</CardTitle>
+            <CardHeader className="space-y-1 pb-4">
+              <CardTitle className="text-xl text-center">Welcome Back</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    Adresa e Email-it
+                    Email Address
                   </label>
                   <Input
                     type="email"
@@ -71,7 +71,7 @@ export default function Login() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2">
                     <Lock className="h-4 w-4 text-muted-foreground" />
-                    Fjalëkalimi
+                    Password
                   </label>
                   <Input
                     type="password"
@@ -97,22 +97,22 @@ export default function Login() {
                   variant="hero"
                   size="lg"
                 >
-                      {submitting ? (
+                  {submitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Duke u kyçur...
+                      Signing in...
                     </>
                   ) : (
                     <>
                       <LogIn className="h-4 w-4" />
-                      Hyr
+                      Sign In
                     </>
                   )}
                 </Button>
               </form>
 
               <div className="pt-4 border-t text-center text-sm text-muted-foreground">
-                <p>Zona e mbrojtur e administratorit - vetëm akses i autorizuar</p>
+                <p>Protected administrator portal — authorized access only</p>
               </div>
             </CardContent>
           </Card>

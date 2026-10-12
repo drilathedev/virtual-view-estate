@@ -20,7 +20,7 @@ const queryClient = new QueryClient();
 
 const AdminRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAdmin, loading } = useAuth();
-  if (loading) return <div className="p-10 text-center">Duke u ngarkuar…</div>;
+  if (loading) return <div className="p-10 text-center font-medium text-muted-foreground">Loading...</div>;
   if (!isAdmin) return <Navigate to="/login" replace />;
   return children;
 };

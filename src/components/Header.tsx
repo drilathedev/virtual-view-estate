@@ -5,11 +5,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { to: '/', label: 'Ballina' },
-  { to: '/properties', label: 'Prona' },
-  { to: '/properties-map', label: 'Harta' },
-  { to: '/services', label: 'Shërbime' },
-  { to: '/contact', label: 'Kontakt' },
+  { to: '/', label: 'Home' },
+  { to: '/properties', label: 'Properties' },
+  { to: '/properties-map', label: 'Map' },
+  { to: '/services', label: 'Services' },
+  { to: '/contact', label: 'Contact' },
 ];
 
 const Logo = ({ light = false }: { light?: boolean }) => (
@@ -78,21 +78,16 @@ export const Header = ({ overlay = false }: HeaderProps) => {
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className={`hidden text-[0.95rem] font-medium md:block ${overlay ? 'text-white/80 hover:text-white' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Hyr
-            </Link>
             <Link to="/contact" className="hidden sm:block">
               <Button className="h-10 rounded-full bg-primary px-5 text-[0.9rem] font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 hover:shadow-medium">
-                Listo pronën
+                List Property
               </Button>
             </Link>
             <button
               className={`flex h-11 w-11 items-center justify-center rounded-full lg:hidden ${overlay ? 'bg-white/15 text-white' : 'bg-secondary text-foreground'}`}
               aria-expanded={open}
               aria-controls="mobile-menu"
+              aria-label={open ? "Close menu" : "Open menu"}
               onClick={() => setOpen((v) => !v)}
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -101,8 +96,7 @@ export const Header = ({ overlay = false }: HeaderProps) => {
         </div>
       </div>
 
-      {/* Full-screen mobile menu — portaled to <body> so it sits in the root
-          stacking context, fully above the Leaflet map and everything else. */}
+      {/* Full-screen mobile menu */}
       {open && createPortal(
         <div className="fixed inset-0 z-[3000] flex flex-col bg-background lg:hidden">
           {/* Top bar */}
@@ -110,7 +104,7 @@ export const Header = ({ overlay = false }: HeaderProps) => {
             <Logo />
             <button
               onClick={() => setOpen(false)}
-              aria-label="Mbyll menunë"
+              aria-label="Close menu"
               className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-foreground"
             >
               <X className="h-5 w-5" />
@@ -141,7 +135,7 @@ export const Header = ({ overlay = false }: HeaderProps) => {
           <div className="shrink-0 space-y-3 px-5 pb-10 pt-4">
             <Link to="/contact" onClick={() => setOpen(false)}>
               <Button className="h-14 w-full rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground hover:bg-primary/90">
-                Listo pronën
+                List Property
               </Button>
             </Link>
             <a
@@ -149,7 +143,7 @@ export const Header = ({ overlay = false }: HeaderProps) => {
               className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl border border-border py-4 text-base font-semibold text-foreground"
             >
               <Phone className="h-4 w-4 text-primary" />
-              +383 49 295 636
+              Call Us
             </a>
           </div>
         </div>,

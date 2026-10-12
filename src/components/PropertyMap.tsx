@@ -128,7 +128,7 @@ export function PropertyMap({ properties }: PropertyMapProps) {
         <div class="w-64 bg-white">
           <div class="relative">
             ${property.image ? `<img src="${property.image}" alt="${property.title}" class="w-full h-36 object-cover" />` : ''}
-            <span class="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-[#d7622d]">${property.forRent ? 'Me Qira' : 'Në Shitje'}</span>
+            <span class="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-[#d7622d]">${property.forRent ? 'For Rent' : 'For Sale'}</span>
           </div>
           <div class="p-3.5">
             <h3 class="font-bold text-[15px] text-gray-900 leading-snug mb-1">${property.title}</h3>
@@ -141,7 +141,7 @@ export function PropertyMap({ properties }: PropertyMapProps) {
             <div class="flex items-center justify-between">
               <span class="font-extrabold text-lg text-[#d7622d]">${property.price.startsWith('€') ? property.price : '€' + property.price}</span>
               <button id="btn-${property.id}" class="rounded-full bg-[#0f1614] hover:bg-[#1a8a8a] text-white text-xs font-semibold py-2 px-4 transition-colors">
-                Detajet
+                View Details
               </button>
             </div>
           </div>
@@ -168,29 +168,32 @@ export function PropertyMap({ properties }: PropertyMapProps) {
     if (bounds.isValid()) {
       map.fitBounds(bounds, { padding: [50, 50] });
     }
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
   }, [validProperties, navigate]);
 
   return (
     <div className="w-full h-full">
       {isGeocoding && (
-        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+        <div className="w-full h-full flex items-center justify-center bg-muted/40">
           <div className="text-center">
-            <p className="text-gray-600 text-lg mb-2">Po ngarkohen lokacionet...</p>
-            <p className="text-gray-500 text-sm">Duke kërkuar koordinata për pronësitë</p>
+            <p className="text-foreground font-semibold text-lg mb-1">Loading property locations...</p>
+            <p className="text-muted-foreground text-sm">Locating coordinates for map pins</p>
           </div>
         </div>
       )}
       {!isGeocoding && validProperties.length === 0 ? (
-        <div className="w-full h-full flex items-center justify-center bg-gray-100">
-          <div className="text-center">
-            <p className="text-gray-600 text-lg mb-2">Nuk ka pronësi për të shfaqur në hartë</p>
-            <p className="text-gray-500 text-sm">Nuk u arrit të gjeodaten lokacionet e pronësive</p>
+        <div className="w-full h-full flex items-center justify-center bg-muted/40">
+          <div className="text-center p-6">
+            <p className="text-foreground font-semibold text-lg mb-1">No properties to display on the map</p>
+            <p className="text-muted-foreground text-sm">Could not resolve coordinates for the selected filter</p>
           </div>
         </div>
       ) : !isGeocoding ? (
         <div
           ref={mapRef}
-          className="w-full h-full rounded-lg"
+          className="w-full h-full"
           style={{ minHeight: '100%' }}
         />
       ) : null}

@@ -18,18 +18,36 @@ import property1 from "@/assets/property-1.jpg";
 import property2 from "@/assets/property-2.jpg";
 import property3 from "@/assets/property-3.jpg";
 
+import { useToast } from "@/hooks/use-toast";
+
 const demoProperties: Record<string, any> = {
-  "demo-1": { id: "demo-1", image: property1, title: "Apartament Modern në Qendër", location: "Prishtinë, Kosovë", price: "€120,000", beds: 2, baths: 2, area: 85, mediaType: "3d", forRent: false, description: "Apartament modern në zemër të Prishtinës. Dhomat e gjera, kuzhina moderne dhe pamje të bukura të qytetit. Afër qendrave tregtare dhe transportit publik.", features: ["Ballkon", "Parking", "Ngrohje qendrore", "Ashensor"], gallery: [property1, property2, property3] },
-  "demo-2": { id: "demo-2", image: property2, title: "Penthouse Luksoz me Pamje", location: "Prishtinë, Kosovë", price: "€2,500/muaj", beds: 3, baths: 3, area: 150, mediaType: "video", forRent: true, description: "Penthouse ekskluziv me pamje panoramike. Ambientet e rafinuara, tarraca të mëdha dhe komoditete premium.", features: ["Tarracë", "Pamje panoramike", "Klimë", "Garazh"], videoUrl: "", gallery: [property2, property1, property3] },
-  "demo-3": { id: "demo-3", image: property3, title: "Shtëpi e Ngrohtë me Oborr", location: "Pejë, Kosovë", price: "€95,000", beds: 2, baths: 1, area: 70, mediaType: "photo", forRent: false, description: "Shtëpi e rehatshme me oborr privat në një lagje të qetë. I përshtatshëm për familje.", features: ["Oborr", "Kopsht", "Bodrum"], gallery: [property3, property1, property2] },
-  "demo-4": { id: "demo-4", image: property1, title: "Studio i Rehatshëm", location: "Prizren, Kosovë", price: "€800/muaj", beds: 1, baths: 1, area: 45, mediaType: "3d", forRent: true, description: "Studio praktik, i përshtatshëm për studentë ose profesionistë të rinj. Komplet i mobiluar dhe i pozicionuar mirë.", features: ["Mobiluar", "Internet"], gallery: [property1, property3] },
-  "demo-5": { id: "demo-5", image: property2, title: "Vilë Luksoze me Pishinë", location: "Prishtinë, Kosovë", price: "€450,000", beds: 5, baths: 4, area: 320, mediaType: "video", forRent: false, description: "Vilë e jashtëzakonshme me pishinë private, kopshte të mëdha dhe përfundime luksoze.", features: ["Pishinë", "Kopsht", "Garazh", "Sistem sigurie"], videoUrl: "", gallery: [property2, property1, property3] },
+  "demo-1": { id: "demo-1", image: property1, title: "Modern Apartment in City Center", location: "Pristina, Kosovo", price: "€120,000", beds: 2, baths: 2, area: 85, mediaType: "3d", forRent: false, description: "Modern apartment situated in the heart of Pristina. Features spacious living areas, a contemporary kitchen, and magnificent skyline views. Walking distance to premium shopping, dining, and public transit.", features: ["Balcony", "Private Parking", "Central Heating", "Elevator"], gallery: [property1, property2, property3] },
+  "demo-2": { id: "demo-2", image: property2, title: "Luxury Penthouse with Skyline Views", location: "Pristina, Kosovo", price: "€2,500/month", beds: 3, baths: 3, area: 150, mediaType: "video", forRent: true, description: "Exclusive penthouse with breathtaking panoramic vistas. Offers refined interior architecture, expansive wrap-around terraces, and premium designer fittings.", features: ["Terrace", "Panoramic Views", "Air Conditioning", "Secure Garage"], videoUrl: "", gallery: [property2, property1, property3] },
+  "demo-3": { id: "demo-3", image: property3, title: "Cozy Family Home with Private Garden", location: "Peja, Kosovo", price: "€95,000", beds: 2, baths: 1, area: 70, mediaType: "photo", forRent: false, description: "Charming and peaceful residence with a private fenced garden in a serene residential neighborhood. Ideal for families seeking comfort and nature.", features: ["Private Yard", "Landscaped Garden", "Storage Basement"], gallery: [property3, property1, property2] },
+  "demo-4": { id: "demo-4", image: property1, title: "Comfortable Modern Studio", location: "Prizren, Kosovo", price: "€800/month", beds: 1, baths: 1, area: 45, mediaType: "3d", forRent: true, description: "Functional, well-lit studio perfectly suited for young professionals and digital nomads. Fully furnished and located in a prime neighborhood.", features: ["Fully Furnished", "High-Speed Internet"], gallery: [property1, property3] },
+  "demo-5": { id: "demo-5", image: property2, title: "Luxury Villa with Private Swimming Pool", location: "Pristina, Kosovo", price: "€450,000", beds: 5, baths: 4, area: 320, mediaType: "video", forRent: false, description: "Magnificent luxury estate boasting an outdoor swimming pool, manicured gardens, expansive living rooms, and state-of-the-art security.", features: ["Swimming Pool", "Lush Garden", "Multi-car Garage", "Security System"], videoUrl: "", gallery: [property2, property1, property3] },
 };
 
 export default function PropertyDetail() {
   const { id } = useParams();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [idx, setIdx] = useState(0);
+  const { toast } = useToast();
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: property?.title || "Property Listing",
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link Copied",
+        description: "Property link copied to your clipboard.",
+      });
+    }
+  };
 
   const { data: property, isLoading, isError, error } = useQuery({
     queryKey: ["property", id],
@@ -44,7 +62,7 @@ export default function PropertyDetail() {
       }
       try {
         const result = await getProperty(id);
-        if (!result) throw new Error("Pronë nuk u gjet");
+        if (!result) throw new Error("Property not found");
         return result;
       } catch (err: any) {
         if (err?.code === "permission-denied" || err?.message?.includes("timeout") || err?.message?.includes("network")) {
@@ -67,7 +85,7 @@ export default function PropertyDetail() {
         <div className="flex min-h-[70vh] items-center justify-center">
           <div className="space-y-4 text-center">
             <Loader2 className="mx-auto h-10 w-10 animate-spin text-primary" />
-            <p className="text-muted-foreground">Po ngarkohen detajet e pronës…</p>
+            <p className="text-muted-foreground">Loading property details…</p>
           </div>
         </div>
       </div>
@@ -84,16 +102,16 @@ export default function PropertyDetail() {
               <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
             <h2 className="text-2xl font-semibold">
-              {error?.message === "SERVICE_UNAVAILABLE" ? "Shërbimi Nuk Është i Disponueshëm" : "Pronë Nuk U Gjet"}
+              {error?.message === "SERVICE_UNAVAILABLE" ? "Service Unavailable" : "Property Not Found"}
             </h2>
             <p className="mt-2 text-muted-foreground">
               {error?.message === "SERVICE_UNAVAILABLE"
-                ? "Ju lutemi provoni përsëri më vonë."
-                : "Pronë e pa-gjetur ose është hequr."}
+                ? "Please try again later."
+                : "The property listing could not be found or has been removed."}
             </p>
             <Link to="/properties">
               <Button className="mt-6 rounded-full bg-primary font-semibold text-primary-foreground hover:bg-primary/90">
-                Kthehu te pronat
+                Back to Properties
               </Button>
             </Link>
           </div>
@@ -115,14 +133,14 @@ export default function PropertyDetail() {
       <main className="container-custom py-6 lg:py-10">
         {/* Breadcrumb */}
         <Link to="/properties" className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-          <ArrowLeft className="h-4 w-4" /> Kthehu te pronat
+          <ArrowLeft className="h-4 w-4" /> Back to properties
         </Link>
 
         {/* Title row */}
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2">
-              <span className="chip bg-primary/10 text-primary">{property.forRent ? "Me Qira" : "Në Shitje"}</span>
+              <span className="chip bg-primary/10 text-primary">{property.forRent ? "For Rent" : "For Sale"}</span>
               <span className="chip bg-secondary capitalize text-foreground/70">{property.type || property.mediaType}</span>
             </div>
             <h1 className="font-display text-3xl font-semibold text-foreground lg:text-4xl">{property.title}</h1>
@@ -132,12 +150,16 @@ export default function PropertyDetail() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground/60 transition-colors hover:bg-secondary">
+            <button
+              onClick={handleShare}
+              aria-label="Share property"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground/60 transition-colors hover:bg-secondary"
+            >
               <Share2 className="h-4 w-4" />
             </button>
             <a href="tel:+38349295636">
               <Button className="h-11 rounded-full bg-primary px-5 font-semibold text-primary-foreground hover:bg-primary/90">
-                <Phone className="mr-2 h-4 w-4" /> Telefono
+                <Phone className="mr-2 h-4 w-4" /> Call Now
               </Button>
             </a>
           </div>
@@ -148,7 +170,7 @@ export default function PropertyDetail() {
           <button onClick={() => openLightbox(0)} className="group relative overflow-hidden rounded-[1.5rem] lg:col-span-2">
             <img src={mainImg} alt={property.title} className="h-72 w-full object-cover transition-transform duration-700 group-hover:scale-105 lg:h-[464px]" />
             <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-primary shadow-soft backdrop-blur">
-              <ImageIcon className="h-4 w-4" /> Shiko {gallery.length} foto
+              <ImageIcon className="h-4 w-4" /> View {gallery.length} photos
             </span>
           </button>
 
@@ -169,32 +191,32 @@ export default function PropertyDetail() {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {property.mediaType !== "land" && (
                 <>
-                  <Spec icon={Bed} value={property.beds} label="Dhoma gjumi" />
-                  <Spec icon={Bath} value={property.baths} label="Banjo" />
+                  <Spec icon={Bed} value={property.beds} label="Bedrooms" />
+                  <Spec icon={Bath} value={property.baths} label="Bathrooms" />
                 </>
               )}
-              <Spec icon={Square} value={property.area} label={property.mediaType === "land" ? "Hektarë" : "m² sipërfaqe"} />
-              <Spec icon={Home} value={property.mediaType === "3d" ? "360°" : property.mediaType === "video" ? "Video" : "Foto"} label="Vizualizim" />
+              <Spec icon={Square} value={property.area} label={property.mediaType === "land" ? "Hectares" : "m² Area"} />
+              <Spec icon={Home} value={property.mediaType === "3d" ? "360° Tour" : property.mediaType === "video" ? "Video" : "Photo"} label="Visualization" />
             </div>
 
             {/* Description */}
-            <div className="rounded-[1.5rem] border border-border bg-card p-7">
-              <h2 className="mb-3 font-display text-xl font-semibold">Përshkrimi i pronës</h2>
+            <div className="rounded-[1.5rem] border border-border bg-card p-7 shadow-soft">
+              <h2 className="mb-3 font-display text-xl font-semibold">Property Description</h2>
               <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
-                {property.description?.trim() ? property.description : "Nuk ka përshkrim për këtë pronë."}
+                {property.description?.trim() ? property.description : "No description provided for this property."}
               </p>
             </div>
 
             {/* 3D tour */}
             {property.kuulaId && property.mediaType === "3d" && (
-              <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card">
+              <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-soft">
                 <div className="flex items-center gap-3 border-b border-border p-5">
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
                     <Move3d className="h-5 w-5 text-primary" />
                   </span>
                   <div>
-                    <div className="font-semibold">Tur Virtual 360°</div>
-                    <div className="text-sm text-muted-foreground">Eksploroni pronën në detaje</div>
+                    <div className="font-semibold">360° Virtual Walkthrough</div>
+                    <div className="text-sm text-muted-foreground">Explore every room interactively</div>
                   </div>
                 </div>
                 <div className="h-[420px] md:h-[560px]">
@@ -205,15 +227,15 @@ export default function PropertyDetail() {
 
             {/* Video */}
             {property.videoUrl && property.mediaType === "video" && (
-              <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card p-3">
+              <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 shadow-soft">
                 <video src={property.videoUrl} className="w-full rounded-[1.1rem]" controls />
               </div>
             )}
 
             {/* Features */}
             {property.features && property.features.length > 0 && (
-              <div className="rounded-[1.5rem] border border-border bg-card p-7">
-                <h2 className="mb-4 font-display text-xl font-semibold">Tiparet e pronës</h2>
+              <div className="rounded-[1.5rem] border border-border bg-card p-7 shadow-soft">
+                <h2 className="mb-4 font-display text-xl font-semibold">Property Features &amp; Amenities</h2>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {property.features.map((f: string, i: number) => (
                     <div key={i} className="flex items-center gap-3 rounded-2xl bg-secondary/50 px-4 py-3">
@@ -228,10 +250,10 @@ export default function PropertyDetail() {
             )}
 
             {/* Location */}
-            <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card p-3">
+            <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 shadow-soft">
               <div className="overflow-hidden rounded-[1.1rem]">
                 <iframe
-                  title="Harta"
+                  title="Property Location Map"
                   width="100%"
                   height="100%"
                   className="h-72 w-full"
@@ -247,17 +269,17 @@ export default function PropertyDetail() {
           {/* Sticky sidebar */}
           <div className="lg:col-span-1">
             <div className="space-y-5 lg:sticky lg:top-24">
-              <div className="rounded-[1.5rem] bg-leaf p-7 text-white">
-                <div className="flex items-center gap-2 text-sm text-white/70">
-                  <Tag className="h-4 w-4" /> {property.forRent ? "Qira mujore" : "Çmimi i shitjes"}
+              <div className="rounded-[1.5rem] bg-leaf p-7 text-white shadow-soft">
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Tag className="h-4 w-4" /> {property.forRent ? "Monthly Rent" : "Listing Price"}
                 </div>
                 <div className="mt-2 font-display text-4xl font-semibold">
                   {priceText}
-                  {property.forRent && <span className="text-base font-normal text-white/70">/muaj</span>}
+                  {property.forRent && <span className="text-base font-normal text-white/80">/month</span>}
                 </div>
                 <a href="tel:+38349295636">
                   <span className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]">
-                    <Phone className="h-4 w-4" /> Cakto një vizitë
+                    <Phone className="h-4 w-4" /> Schedule a Viewing
                   </span>
                 </a>
               </div>
